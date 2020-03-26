@@ -145,7 +145,7 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   eval(parse(text = paste("rownames(",dtt,"@Outputs@summary) <<- c()")))
   eval(parse(text = paste("colnames(",dtt,"@Outputs@timesteps) <<- datahead")))
   eval(parse(text = paste("colnames(",dtt,"@Outputs@summary) <<- sumhead")))
-  unlink(paste(pat,"data_temp.csv",sep=""))
+  unlink(paste(pat,"temp_data.csv",sep=""))
   unlink(paste(pat,"gs_lims_temp.csv",sep=""))}
 
 
