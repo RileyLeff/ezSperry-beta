@@ -129,8 +129,6 @@ new_sperry_model = function(path){
     return(xyz)
 }
 
-sumhead = read.csv("/Users/rileyleff/Desktop/eztest/sumheader.csv", h = FALSE, colClasses=rep("character",33))
-datahead = read.csv("/Users/rileyleff/Desktop/eztest/dataheader.csv", h = FALSE, colClasses=rep("character",70))
 
 run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   pat = model_obj@path
@@ -139,6 +137,8 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   runit2(model_obj, pat)
   print(dtt)
   print(substitute(dtt))
+  sumhead = read.csv(paste(model_obj@path,"sumheader.csv",sep=""), h = FALSE, colClasses=rep("character",33))
+  datahead = read.csv(paste(model_obj@path,"dataheader.csv",sep=""), h = FALSE, colClasses=rep("character",70))
   eval(parse(text = paste(dtt,"@Outputs@timesteps <<- as.data.frame(t(as.data.frame(",dtt,"@Outputs@timesteps)))")))
   eval(parse(text = paste("rownames(",dtt,"@Outputs@timesteps) <<- c()")))
   eval(parse(text = paste(dtt,"@Outputs@summary <<- as.data.frame(t(as.data.frame(",dtt,"@Outputs@summary)))")))
