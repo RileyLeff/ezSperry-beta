@@ -1,0 +1,18 @@
+---
+title: "Getting Started"
+author: "Riley Leff"
+date: "3/26/2020"
+output: html_document
+---
+
+```{r}
+library(Rcpp)
+sourceCpp("/Users/rileyleff/Desktop/eztest/SperryModelBase.cpp")
+source("/Users/rileyleff/Desktop/eztest/classes.R")
+```
+
+```{r}
+model1 = new_sperry_model("/Users/rileyleff/Desktop/eztest/")
+run_sperry(model1)
+model1@Outputs@timesteps
+```
