@@ -16,3 +16,25 @@ model1 = new_sperry_model("/Users/rileyleff/Desktop/eztest/")
 run_sperry(model1)
 model1@Outputs@timesteps
 ```
+
+```{r}
+# found a bug? shoot Riley a message and you'll increase your score on the leaderboard!
+# Try it here: 
+
+dfout = ez_leaderboard() # prints leaderboard
+dfout # prints scoring log 
+
+# Scoring: 
+    # 3 points -- found error in code base
+    # 2 points -- found error in docs OR good idea for code base
+    # 1 point -- good idea for docs
+
+# leaderboard updates in real-time.....but won't work if you're not connected to internet
+# if function fails, try manually installing the packages "httr" and "stringr"
+```
+
+
+
+
+
+

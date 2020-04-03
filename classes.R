@@ -149,7 +149,55 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   unlink(paste(pat,"gs_lims_temp.csv",sep=""))}
 
 
+ez_leaderboard = function(){
+  
+  if(!require(httr)){
+    install.packages("httr")
+    library(httr)}
+  
+  if(!require(stringr)){
+    install.packages("stringr")
+    library(stringr)}
 
+  req2 = GET("https://github.com/RileyLeff/ezSperry-beta/blob/master/crowdlog.csv")
+  pulled = content(req2, "text")
+  
+  start1 = regexpr("<th", pulled)
+  stop1 = regexpr("</tbod", pulled)
+  pruned = substr(pulled, start1, stop1)
+  
+  starts1 = str_locate_all(pruned, "<td>")[[1]][,"end"]
+  starts1 = starts1 + 1
+  
+  stops1 = str_locate_all(pruned, "</td>")[[1]]
+  stops1 = stops1[-1,"start"][-seq(1,length(stops1),4)]
+  stops1 = stops1-1
+  
+  namevec = c()
+  improvec = c()
+  scorevec = c()
+  
+  for(i in 1:length(starts1)){
+    if(i %% 3 == 1){
+      namevec[ceiling(i/3)] = substr(pruned, starts1[i], stops1[i])}
+    else if(i %% 3 == 2){
+      improvec[ceiling(i/3)] = substr(pruned, starts1[i], stops1[i])}
+    else{
+      scorevec[ceiling(i/3)] = as.numeric(substr(pruned, starts1[i], stops1[i]))}}
+
+  dfout = data.frame(Name = as.factor(namevec), Improvements = as.character(improvec), Points_Awarded = scorevec)
+  df2 = aggregate(. ~ Name, dfout, sum)[,-2]
+  df3  = df2[order(-df2$Points_Awarded),]
+  
+  barplot(df3$Points_Awarded,
+          main = "ezSperry Beta Improvement -- Live Leaderboard",
+          xlab = "Name",
+          ylab = paste("Score as of ", Sys.time(), sep = ""),
+          names.arg = df3$Name,
+          col = "slateblue1",
+          horiz = FALSE) 
+  
+  return(dfout)}
 
 
 
