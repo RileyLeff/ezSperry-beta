@@ -205,6 +205,11 @@ long getColFromName(std::string name)
    return 0;
 }
 
+NumericVector ri_j;
+NumericVector ri_v;
+NumericVector ri_l;
+bool weibin_mode;
+
 class ModelProgram
 {
 public:
@@ -234,6 +239,8 @@ public:
     NumericVector ri_vg_n = NumericVector(5);
     NumericVector ri_ksat = NumericVector(5);
     NumericVector ri_theta_sat = NumericVector(5);
+    
+
 
    std::string failspot, layerfailure[6], tlayerfailure[6], setting, refilling, ground, soilred;
    double dp, kplant[100001], kminplant, toplayer;
@@ -2701,10 +2708,21 @@ public:
       comp = comp25 * exp((37830 * ((leaftemp[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftemp[p] + 273.15))); //'Bernacchi via Medlyn
       numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftemp[p])));
       denominator = 1 + exp((svvmax * (273.2 + leaftemp[p]) - hdvmax) / (gas * (273.2 + leaftemp[p])));
-      vmax = vmax25 * numerator / denominator; //'vmax corrected via Leunig 2002
+       if(weibin_mode){
+           vmax = ri_v[dd-1];
+       } else {vmax = vmax25 * numerator / denominator;
+       }
+       //'vmax corrected via Leunig 2002
       numerator = (1 + exp((svjmax * 298.2 - hdjmax) / (gas * 298.2))) * exp((hajmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftemp[p])));
       denominator = 1 + exp((svjmax * (273.2 + leaftemp[p]) - hdjmax) / (gas * (273.2 + leaftemp[p])));
+       if(weibin_mode){
+           jmax = ri_j[dd - 1];
+           
+          
+       } else {
       jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
+           }
+       
       kc = kc25 * exp((79430 * ((leaftemp[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftemp[p] + 273.15))); //'Bernacchi via Medlyn
       ko = ko25 * exp((36380 * ((leaftemp[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftemp[p] + 273.15))); //'Bernacchi via Medlyn
       rday25 = vmax25 * 0.01; //'from Medlyn 2002
@@ -2778,12 +2796,18 @@ public:
       gcancsh[p] = (gcanwsh[p] / 1.6) * 1000; //'convert to CO2 conductance in umol m-2 s-1
                                               //'adjust photosynthetic inputs for Tleaf
       comp = comp25 * exp((37830 * ((leaftempsh[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftempsh[p] + 273.15))); //'Bernacchi via Medlyn
-      numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftempsh[p])));
-      denominator = 1 + exp((svvmax * (273.2 + leaftempsh[p]) - hdvmax) / (gas * (273.2 + leaftempsh[p])));
-      vmax = vmax25 * numerator / denominator; //'vmax corrected via Leunig 2002
-      numerator = (1 + exp((svjmax * 298.2 - hdjmax) / (gas * 298.2))) * exp((hajmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftempsh[p])));
-      denominator = 1 + exp((svjmax * (273.2 + leaftempsh[p]) - hdjmax) / (gas * (273.2 + leaftempsh[p])));
-      jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
+       if(weibin_mode){
+           // RILEY4
+           vmax = ri_v[dd-1];
+           jmax = ri_j[dd-1];
+       } else{
+           numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftempsh[p])));
+           denominator = 1 + exp((svvmax * (273.2 + leaftempsh[p]) - hdvmax) / (gas * (273.2 + leaftempsh[p])));
+           vmax = vmax25 * numerator / denominator; //'vmax corrected via Leunig 2002
+           numerator = (1 + exp((svjmax * 298.2 - hdjmax) / (gas * 298.2))) * exp((hajmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftempsh[p])));
+           denominator = 1 + exp((svjmax * (273.2 + leaftempsh[p]) - hdjmax) / (gas * (273.2 + leaftempsh[p])));
+           jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
+       }
       kc = kc25 * exp((79430 * ((leaftempsh[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftempsh[p] + 273.15))); //'Bernacchi via Medlyn
       ko = ko25 * exp((36380 * ((leaftempsh[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftempsh[p] + 273.15))); //'Bernacchi via Medlyn
       rday25 = vmax25 * 0.01; //'from Medlyn 2002
@@ -3192,13 +3216,19 @@ public:
       gcancmd = (gcanwmd / 1.6) * 1000; //'convert to CO2 conductance in umol m-2 s-1
                                         //'adjust photosynthetic inputs for Tleaf
       comp = comp25 * exp((37830 * ((leaftmd + 273.15) - 298.15)) / (298.15 * gas * (leaftmd + 273.15))); //'Bernacchi via Medlyn
-      numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftmd)));
+      if(weibin_mode){
+               // RILEY4
+               vmax = ri_v[dd-1];
+               jmax = ri_j[dd-1];
+           } else{
+               numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftmd)));
       denominator = 1 + exp((svvmax * (273.2 + leaftmd) - hdvmax) / (gas * (273.2 + leaftmd)));
       vmax = vmax25 * numerator / denominator; //'vmax corrected via Leunig 2002
       numerator = (1 + exp((svjmax * 298.2 - hdjmax) / (gas * 298.2))) * exp((hajmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftmd)));
       denominator = 1 + exp((svjmax * (273.2 + leaftmd) - hdjmax) / (gas * (273.2 + leaftmd)));
       jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
-      kc = kc25 * exp((79430 * ((leaftmd + 273.15) - 298.15)) / (298.15 * gas * (leaftmd + 273.15))); //'Bernacchi via Medlyn
+           }
+               kc = kc25 * exp((79430 * ((leaftmd + 273.15) - 298.15)) / (298.15 * gas * (leaftmd + 273.15))); //'Bernacchi via Medlyn
       ko = ko25 * exp((36380 * ((leaftmd + 273.15) - 298.15)) / (298.15 * gas * (leaftmd + 273.15)));//'Bernacchi via Medlyn
       rday25 = vmax25 * 0.01; //'from Medlyn 2002
       rdaymd = rday25 * pow(2, ((leaftmd - 25) / 10.0));
@@ -3277,13 +3307,19 @@ public:
       gcancshmd = (gcanwshmd / 1.6) * 1000; //'convert to CO2 conductance in umol m-2 s-1
                                             //'adjust photosynthetic inputs for Tleaf
       comp = comp25 * exp((37830 * ((leaftshmd + 273.15) - 298.15)) / (298.15 * gas * (leaftshmd + 273.15))); //'Bernacchi via Medlyn
-      numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftshmd)));
+      if(weibin_mode){
+               // RILEY4
+               vmax = ri_v[dd-1];
+               jmax = ri_j[dd-1];
+           } else{
+               numerator = (1 + exp((svvmax * 298.2 - hdvmax) / (gas * 298.2))) * exp((havmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftshmd)));
       denominator = 1 + exp((svvmax * (273.2 + leaftshmd) - hdvmax) / (gas * (273.2 + leaftshmd)));
       vmax = vmax25 * numerator / denominator; //'vmax corrected via Leunig 2002
       numerator = (1 + exp((svjmax * 298.2 - hdjmax) / (gas * 298.2))) * exp((hajmax / (gas * 298.2)) * (1 - 298.2 / (273.2 + leaftshmd)));
       denominator = 1 + exp((svjmax * (273.2 + leaftshmd) - hdjmax) / (gas * (273.2 + leaftshmd)));
       jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
-      kc = kc25 * exp((79430 * ((leaftshmd + 273.15) - 298.15)) / (298.15 * gas * (leaftshmd + 273.15))); //'Bernacchi via Medlyn
+           }
+               kc = kc25 * exp((79430 * ((leaftshmd + 273.15) - 298.15)) / (298.15 * gas * (leaftshmd + 273.15))); //'Bernacchi via Medlyn
       ko = ko25 * exp((36380 * ((leaftshmd + 273.15) - 298.15)) / (298.15 * gas * (leaftshmd + 273.15))); //'Bernacchi via Medlyn
       rday25 = vmax25 * 0.01; //'from Medlyn 2002
       rdayshmd = rday25 * pow(2, ((leaftshmd - 25) / 10.0));
@@ -4278,7 +4314,6 @@ public:
          vpd = maxvpd;
          dSheet.Cells(rowD + dd, colD + dColD) = maxvpd * patm; //'print out maximum vpd
       } //End if//
-
       getsoilwetness(); //'after initializing, start updating water contents of soil layers
       solarcalc(); //'get radiation for timestep
       if (qsl > lightcomp /*[HNT] multiyear*/ && gs_inGrowSeason /*[/HNT]*/) { //if//
@@ -5032,8 +5067,22 @@ long ModelProgram::modelProgramMain(S4 modelobj, std::string path9) //program st
 }
 
 // [[Rcpp::export]]
-int runit2(S4 modelobj, std::string path9)
+int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0)
 {
+    
+    // RILEY :: yo are we in weibin mode???? young sperrymodel he kinda vibin in weibin mode doe
+    S4 r_p_1 = modelobj.slot("Parameters");
+    S4 r_o_1 = r_p_1.slot("Options");
+    weibin_mode = r_o_1.slot("weibin_mode");
+    
+    if(weibin_mode){
+        Rcout << "Weibin Mode is ACTIVATED." << "\n";
+        ri_j = jmax_vary;
+        ri_v = vmax_vary;
+        ri_l = lai_vary;
+    }
+   
+    
    // seed the random number generator with something crazy
    srand((unsigned)(time(0) * time(0)));
    // set the cout decimal precision

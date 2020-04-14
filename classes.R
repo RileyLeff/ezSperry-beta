@@ -66,8 +66,8 @@
 # OPTIONS
 #####
   setClass("Options", representation(gw_p = "numeric", gw_d = "numeric", gw = "logical", 
-    soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical"), prototype(gw_p = 0, 
-    gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE))
+    soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical", weibin_mode = "logical"), prototype(gw_p = 0, 
+    gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE, weibin_mode = FALSE))
 
 
 #####
@@ -125,18 +125,33 @@ setClass("Sperry_Model", representation(Parameters = "Sperry_Parameters", data =
 new_sperry_model = function(path){
   xyz = new("Sperry_Model", path = path)
   xyz@data = read.csv(paste(path,"ex_data_short.csv",sep=""))
+  xyz@data$Jmax_optional = as.numeric(xyz@data$Jmax_optional)
+  xyz@data$Vmax_optional = as.numeric(xyz@data$Vmax_optional)
+  xyz@data$Lai_optional = as.numeric(xyz@data$Lai_optional)
   xyz@Parameters@gs_limits = read.csv(paste(path, "ex_gs_limits.csv",sep = ""))
     return(xyz)
 }
 
 
+
+
 run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   pat = model_obj@path
+  
+  if(model_obj@Parameters@Options@weibin_mode){
+    riley_jmax_array = model_obj@data$Jmax_optional
+    riley_vmax_array = model_obj@data$Vmax_optional
+    riley_lai_array = model_obj@data$Lai_optional
+    write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
+    write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
+    runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array)
+  } else{
+    
   write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
   write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
   runit2(model_obj, pat)
-  print(dtt)
-  print(substitute(dtt))
+  }
+  
   sumhead = read.csv(paste(model_obj@path,"sumheader.csv",sep=""), h = FALSE, colClasses=rep("character",33))
   datahead = read.csv(paste(model_obj@path,"dataheader.csv",sep=""), h = FALSE, colClasses=rep("character",70))
   eval(parse(text = paste(dtt,"@Outputs@timesteps <<- as.data.frame(t(as.data.frame(",dtt,"@Outputs@timesteps)))")))

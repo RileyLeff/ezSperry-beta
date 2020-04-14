@@ -21,8 +21,8 @@ model1@Outputs@timesteps
 # found a bug? shoot Riley a message and you'll increase your score on the leaderboard!
 # Try it here: 
 
-dfout = ez_leaderboard() # prints leaderboard
-dfout # prints scoring log 
+score_log = ez_leaderboard() # prints leaderboard
+score_log # prints scoring log 
 
 # Scoring: 
     # 3 points -- found error in code base
@@ -30,6 +30,7 @@ dfout # prints scoring log
     # 1 point -- good idea for docs
 
 # leaderboard updates in real-time.....but won't work if you're not connected to internet
+# just run the function again to get the latest scoreboard.  no need to re-source or re-download.
 # if function fails, try manually installing the packages "httr" and "stringr"
 ```
 
