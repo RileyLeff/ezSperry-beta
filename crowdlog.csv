@@ -14,3 +14,6 @@ Wenzhi,Freebie for being an absolute powerhouse,1
 Alex,Identified duplicate and missing columns in output,3
 Alex,Found missing loam data,3
 Alex,Suggested weibull machine,2
+Alex,Kmax vs K_sat catches,3
+Alex,van genuchten weird behavior and units,3
+Alex,sub-classes exposed to global environment,2
