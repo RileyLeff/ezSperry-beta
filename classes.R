@@ -201,14 +201,12 @@ ez_leaderboard = function(){
       scorevec[ceiling(i/3)] = as.numeric(substr(pruned, starts1[i], stops1[i]))}}
 
   dfout = data.frame(Name = as.factor(namevec), Improvements = as.character(improvec), Points_Awarded = scorevec)
-  df2 = aggregate(. ~ Name, dfout, sum)[,-2]
-  df3  = df2[order(-df2$Points_Awarded),]
-  
-  barplot(df3$Points_Awarded,
+  df2 = aggregate(dfout$Points_Awarded,  by=list(ID = dfout$Name), FUN=sum)
+  barplot(df2$x,
           main = "ezSperry Beta Improvement -- Live Leaderboard",
           xlab = "Name",
           ylab = paste("Score as of ", Sys.time(), sep = ""),
-          names.arg = df3$Name,
+          names.arg = df2$ID,
           col = "slateblue1",
           horiz = FALSE) 
   
