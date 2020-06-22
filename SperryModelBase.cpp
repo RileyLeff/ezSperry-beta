@@ -208,7 +208,11 @@ long getColFromName(std::string name)
 NumericVector ri_j;
 NumericVector ri_v;
 NumericVector ri_l;
+List ri_swc;
+NumericVector ri_dep;
 bool weibin_mode;
+bool alex_mode;
+bool depth_mode;
 
 class ModelProgram
 {
@@ -233,13 +237,13 @@ public:
    // [HNT] store virgin curves
    double el_v[100001], es_v[100001], er_v[6][100001], kr_v[6][100001];
    // [/HNT]
-    
-        
+
+
     NumericVector ri_vg_a = NumericVector(5);
     NumericVector ri_vg_n = NumericVector(5);
     NumericVector ri_ksat = NumericVector(5);
     NumericVector ri_theta_sat = NumericVector(5);
-    
+
 
 
    std::string failspot, layerfailure[6], tlayerfailure[6], setting, refilling, ground, soilred;
@@ -462,7 +466,7 @@ public:
    const double abspar = 0.8; //'absorptivity of par for leaves
    const double absnir = 0.2; //'absorptivity of near infrared for leaves
 
-   
+
 
    double rvg(double &x) //'gives soil Y in MPa from soil theta/thetasat=x
    {
@@ -665,7 +669,7 @@ public:
       //std::cout << "Reading parameters from " << paramFileName << std::endl;
 
       std::ifstream paramFile(paramFileName);
-      
+
 
       // load the string values of all the parameters into an array
       // in most cases these need to be converted to doubles when called on:
@@ -900,10 +904,10 @@ public:
          std::cout << "Skipping GS RANGE load -- Years will be treated as independent." << std::endl;
       }
    }
-    
+
     void riley_data_in(S4 modelobj){
         //DataFrame ri_d = modelobj.slot("data");
-      
+
     }
 
    void readDataSheet(std::string path9)
@@ -1017,27 +1021,27 @@ public:
     void readin(S4 modelobj) //'inputs and calculates all parameters at the start
        {
            Rcout << " Riley, you madlad, can't believe this works lmao ..." << "reading R data into c++ " << "\n";
-           
+
            S4 riley_p = modelobj.slot("Parameters");
-           
+
                S4 riley_p_plant = riley_p.slot("Plant");
            S4 riley_p_stand = riley_p.slot("Stand");
                S4 riley_p_atmos = riley_p.slot("Atmospheric");
                S4 riley_p_photos = riley_p.slot("Photosynthesis");
                S4 riley_p_opt = riley_p.slot("Options");
            S4 riley_p_soil = riley_p.slot("Soil");
-           
+
                 Rcpp::RObject ri_w_init = riley_p.slot("weibull");
                 Rcpp::DataFrame ri_weibull = Rcpp::DataFrame(ri_w_init.get__());
-                
+
            NumericVector ri_w_root = ri_weibull[1];
            NumericVector ri_w_stem = ri_weibull[2];
            NumericVector ri_w_leaf = ri_weibull[3];
-           
+
            Rcpp::RObject ri_psoil_init = riley_p.slot("soil_layers");
            Rcpp::DataFrame ri_soil_layers = Rcpp::DataFrame(ri_psoil_init.get__());
-           
-           
+
+
           std::cout << "INIT: Setting up model parameters. (year count = " << gs_yearIndex << ")" << std::endl;
 
            treeToPhotoLAI = riley_p_soil.slot("tlai_to_plai");//getValueFromNameDbl("i_treeToPhotoLAI"); // these names come from the "nametable" and correspond to cells in the parameters csv
@@ -1136,6 +1140,16 @@ public:
              //Cells(8 + k, 11) = 0.01 * Log(1 - k * 0.995 / layers) / Log(beta) //lower depth of each layer converted to m
              layerDepths[k] = 0.01 * log(1.0 - k * 0.995 / layers) / log(beta); //lower depth of each layer converted to m
              paramCells[rowLR + k][colLR + 11] = std::to_string(layerDepths[k]);
+             // RILEY :: override time boys
+             if(depth_mode){
+               layerDepths[k] = ri_dep[k];
+             } // override over for here
+          }
+          std::cout << "Hi Sperry Model user, layer depths are currently as follows." << std::endl;
+
+          for (k = 1; k <= layers; k++)
+          {
+          std::cout << "Layer " << k << " has a depth of " << layerDepths[k] << std::endl;
           }
           //depthmax = Cells(8 + layers, 11) //max depth in meters
           //depthmax = lSheet.Cells(rowLR + layers, colLR + 11) //max depth in meters
@@ -1145,6 +1159,9 @@ public:
           for (k = 1; k <= layers * 2.0; k++)
           {
              vertdistance[k] = 0.01 * log(1 - k * 0.995 / (layers * 2.0)) / log(beta); //get half depths
+             if(depth_mode){
+               layerDepths[k] = ri_dep[k]/2;
+             } // override over for here
           }
           i = 0;
           for (k = 1; k <= layers * 2; k += 2) // To layers * 2 Step 2
@@ -1177,18 +1194,18 @@ public:
           depth[0] = 0; //depth of surface
            rockfrac = riley_p_soil.slot("rock_fraction");//getValueFromNameDbl("i_rockFrac"); //Cells(4, 27) //fraction of soil volume as rocks
           rockfrac = 1 - rockfrac; //fraction of volume with no rocks
-           
-           
+
+
            // WARNING FOR RILEY
            // THIS PART DOESN"T VIBE WITH WHAT YOU'RE DOING
            // TIME TO SWITCH IT UP
-           
+
            NumericVector ri_vg_a = ri_soil_layers[0];
            NumericVector ri_vg_n = ri_soil_layers[1];
            NumericVector ri_ksat = ri_soil_layers[2];
            NumericVector ri_theta_sat = ri_soil_layers[3];
-           
-           
+
+
           for (k = 1; k <= layers; k++) //To layers //read in soil
           {
              //kkmax(k) = Cells(8 + k, 3) //saturated conductivity of soil in kg hr - 1MPa - 1 m - 1
@@ -1280,7 +1297,7 @@ public:
           }
            // FUTURE RILEY :: HELLO.  PAST RILEY CONVERTED BOOLEAN R REFILLING TO "Y" or "N" FOR BACKWARDS COMPATIBILITY
            // THIS IS DUMB BUT FUCK IT WE LIVIN LARGE
-           
+
            bool refill_choice = riley_p_opt.slot("refilling");
            if(refill_choice){
                refilling = "y";
@@ -1327,40 +1344,40 @@ public:
                                                                 //timestep = Cells(4, 27) //timestep in fraction of hour
            pground = riley_p_opt.slot("gw_p");//getValueFromNameDbl("i_gWaterP"); //Cells(5, 27) //ground water pressure
            grounddistance = riley_p_opt.slot("gw_d");//getValueFromNameDbl("i_gWaterDist"); //Cells(6, 27) //distance to ground water source in m
-          
+
            bool gw_choice = riley_p_opt.slot("gw");
            if(gw_choice){
                ground="y";
            } else{
                ground="n";
            }
-           
+
            bool sr_choice = riley_p_opt.slot("soil_redist");
            if(sr_choice){
                soilred="y";
            } else{
                soilred="n";
            }
-           
+
            bool se_choice = riley_p_opt.slot("soil_evap");
            if(se_choice){
                sevap="y";
            } else{
                sevap="n";
            }
-           
+
            bool ra_choice = riley_p_opt.slot("rain");
            if(ra_choice){
                raining="y";
            } else{
                raining="n";
            }
-           
+
            // DEAR FUTURE RILEY AND ANY/ALL FUTURE READERS
            // PLEASE APPRECIATE THE HILARITY OF THIS CODE CHUNK
            // THERE WILL NEVER BE PEACE BETWEEN YN AND TF
            // THEY WILL MORPH BACK AND FORTH ETERNALLY
-           
+
            //ground = getValueFromNameStr("i_gWaterEnable"); //Cells(7, 27) //groundwater flow, yes or no
           //soilred = getValueFromNameStr("i_soilRedEnable"); //Cells(8, 27) //turns off / on soil redistribution routine
           //sevap = getValueFromNameStr("i_soilEvapEnable"); //Cells(9, 27) //turns off / on soil evaporation routine
@@ -1392,13 +1409,13 @@ public:
           }
           else if (stage_ID == STAGE_ID_HIST_OPT || stage_ID == STAGE_ID_FUT_OPT)
           {
-            
+
                 useGSData = true;
           }
           else // impossible unknown stage failsafe
              useGSData = false;
        }
-   
+
 
    short initModelVars()
    {
@@ -1514,7 +1531,7 @@ public:
                dedpf[qqq] = 0;
                cin[qqq] = 0;
             }
-            // 6,100k 2d arrays 
+            // 6,100k 2d arrays
             if (qqq < 100001) //don't mix up the 100k and 1mil arrays
             {
                er[iii][qqq] = 0;
@@ -2177,6 +2194,20 @@ public:
             {
                x = 10; //'MPa water potential for getting residual thetafrac
                thetafracres[z] = swc(x); //'residual thetafrac
+               // RILEY :: swc override
+               //Rcout << "before alex mode " << dd << " \n";
+               //Rcout << "z " << z << " \n";
+               if(alex_mode & z > 0){
+                 List this_it = ri_swc[dd-1];
+                 //Rcout << "checkpoint a " << " \n";
+                 //Rcout << "this_it is " << this_it << " \n";
+                double this_swc = this_it[z-1];
+                //Rcout << "checkpoint b " << " \n";
+                //Rcout << "this_swc is " << this_swc << " \n";
+                 thetafracres[z] = this_swc;
+                 //Rcout << "after alex mode " << z << " \n";
+               }
+
                thetafracfc[z] = (1 - thetafracres[z]) * fieldcapfrac + thetafracres[z]; //'thetafrac at field capacity
                thetafc[z] = thetasat[z] * thetafracfc[z]; //'water content at field capacity
             } //for//z //'
@@ -2717,12 +2748,12 @@ public:
       denominator = 1 + exp((svjmax * (273.2 + leaftemp[p]) - hdjmax) / (gas * (273.2 + leaftemp[p])));
        if(weibin_mode){
            jmax = ri_j[dd - 1];
-           
-          
+
+
        } else {
       jmax = jmax25 * numerator / denominator; //'jmax corrected via Leunig 2002
            }
-       
+
       kc = kc25 * exp((79430 * ((leaftemp[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftemp[p] + 273.15))); //'Bernacchi via Medlyn
       ko = ko25 * exp((36380 * ((leaftemp[p] + 273.15) - 298.15)) / (298.15 * gas * (leaftemp[p] + 273.15))); //'Bernacchi via Medlyn
       rday25 = vmax25 * 0.01; //'from Medlyn 2002
@@ -3749,7 +3780,7 @@ public:
       do //find efinish
       {
          j = j + 1;
-         if (el[j] == 0) //= Empty 
+         if (el[j] == 0) //= Empty
          {
             test = 1;
             failspot = "leaf";
@@ -4244,7 +4275,7 @@ public:
             if (gs_yearIndex >= 100)
                gs_yearIndex = 99; //safety check
 
-            gs_ar_years[gs_yearIndex] = year_cur; // correct the year listing in the "growing seasons" array 
+            gs_ar_years[gs_yearIndex] = year_cur; // correct the year listing in the "growing seasons" array
                                                   // TODO make that input data able to handle the new system?? Otherwise just eliminate
                                                   // on VBA side it might be sufficient to pull the start year from the first line of data
                                                   // though this still assumes that our data is in linear time order ...
@@ -4568,6 +4599,12 @@ public:
          for (z = 1; z <= layers; z++)//z = 1 To layers
          {
             swclimit[z] = swc(x); //'theta/thetasat at critical point
+            // RILEY :: swc override
+            if(alex_mode & z > 0){
+              List this_it = ri_swc[dd-1];
+              double this_swc = this_it[z-1];
+              swclimit[z] = this_swc;
+            }
             swclimit[z] = swclimit[z] * thetasat[z]; //'convert to water content
             swclimit[z] = swclimit[z] * depth[z]; //'water content left over in m3/m2 ground area
                                                   //'sumsoil = sumsoil + (fc[z] - swclimit[z]) //'sum is total m3 water per m2 ground withdrawn
@@ -4751,26 +4788,26 @@ public:
     {
         DataFrame ts_out_df = DataFrame::create();
          DataFrame su_out_df = DataFrame::create();
-        
+
         Rcout << "dd is " << dd << " \n";
         Rcout << "yearCount is " << yearCount << " \n";
-        
+
          for(int i=2; i < dd+3; i++){
            NumericVector otto(dataCells[i]+1,dataCells[i]+71);
            ts_out_df.push_back(otto);
            }
-         
+
          for(int i=3; i < 3+yearCount; i++){
            NumericVector milo(finalOutCells[i]+1,finalOutCells[i]+34);
            su_out_df.push_back(milo);
          }
-        
+
          S4 ri_o = modelobj.slot("Outputs");
-         
+
          ri_o.slot("timesteps") = ts_out_df;
          ri_o.slot("summary") = su_out_df;
          }
-        
+
 
    void saveOutputSheet(std::string filename, std::string sheetType)
    {
@@ -5067,22 +5104,38 @@ long ModelProgram::modelProgramMain(S4 modelobj, std::string path9) //program st
 }
 
 // [[Rcpp::export]]
-int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0)
+int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0)
 {
-    
+
     // RILEY :: yo are we in weibin mode???? young sperrymodel he kinda vibin in weibin mode doe
     S4 r_p_1 = modelobj.slot("Parameters");
     S4 r_o_1 = r_p_1.slot("Options");
     weibin_mode = r_o_1.slot("weibin_mode");
-    
+
     if(weibin_mode){
         Rcout << "Weibin Mode is ACTIVATED." << "\n";
         ri_j = jmax_vary;
         ri_v = vmax_vary;
         ri_l = lai_vary;
     }
-   
-    
+
+    // RILEY :: yo are we in alex mode???? young sperrymodel he kinda vibin in weibin mode doe
+    alex_mode = r_o_1.slot("alex_mode");
+
+    if(alex_mode){
+      Rcout << "Alex mode is ACTIVATED." << "\n";
+      ri_swc = swc_vary;
+    }
+
+    // RILEY :: depth
+    depth_mode = r_o_1.slot("depth_override");
+
+    if(depth_mode){
+      Rcout << "Depth override is ACTIVATED.  Riley is exhausted." << "\n";
+      ri_dep = dep_vary;
+    }
+
+
    // seed the random number generator with something crazy
    srand((unsigned)(time(0) * time(0)));
    // set the cout decimal precision

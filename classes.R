@@ -36,7 +36,8 @@
           soillayerdf = data.frame(vg_a = c(765.3075,765.3075,765.3075,765.3075,765.3075),
                                    vg_n = c(1.89,1.89,1.89,1.89,1.89),
                                    ksat = c(4510.168,4510.168,4510.168,4510.168,4510.168),
-                                   theta_sat = c(.41,.41,.41,.41,.41))
+                                   theta_sat = c(.41,.41,.41,.41,.41),
+                                   depths_optional = c(.2,.5,.7,1.2, 1.5))
       # params
           setClass("Soil", representation(field_cap_frac = "numeric", 
             init_p_field_cap = "numeric", rock_fraction = "numeric", soil_abs = "numeric",
@@ -66,8 +67,8 @@
 # OPTIONS
 #####
   setClass("Options", representation(gw_p = "numeric", gw_d = "numeric", gw = "logical", 
-    soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical", weibin_mode = "logical"), prototype(gw_p = 0, 
-    gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE, weibin_mode = FALSE))
+    soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical", weibin_mode = "logical", alex_mode = "logical", depth_override = "logical"), prototype(gw_p = 0, 
+    gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE, weibin_mode = FALSE, alex_mode = FALSE, depth_override = FALSE))
 
 
 #####
@@ -82,8 +83,8 @@ gslimproto = data.frame(Year=c(1971,1972), Day_start=c(145,142), Day_end=c(267,2
 setClass("Sperry_Parameters", 
          representation(weibull = "data.frame", Plant = "Plant", Stand = "Stand", 
           Soil = "Soil", Photosynthesis = "Photosynthesis", Atmospheric = "Atmosphere", 
-          Options = "Options", gs_limits = "data.frame", soil_layers = "data.frame"), prototype(weibull = weib_df,
-           gs_limits = gslimproto, soil_layers = soillayerdf))
+          Options = "Options", gs_limits = "data.frame", soil_layers = "data.frame", swc_optional = "list"), prototype(weibull = weib_df,
+           gs_limits = gslimproto, soil_layers = soillayerdf, swc_optional = list()))
 
 
 
@@ -138,19 +139,31 @@ new_sperry_model = function(path){
 run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   pat = model_obj@path
   
+  riley_jmax_array = NA
+  riley_vmax_array = NA
+  riley_lai_array = NA
+  riley_swc_array = NA
+  riley_depth_array = NA
+  
   if(model_obj@Parameters@Options@weibin_mode){
     riley_jmax_array = model_obj@data$Jmax_optional
     riley_vmax_array = model_obj@data$Vmax_optional
-    riley_lai_array = model_obj@data$Lai_optional
-    write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
-    write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
-    runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array)
-  } else{
+    riley_lai_array = model_obj@data$Lai_optional}
+  
+  if(model_obj@Parameters@Options@alex_mode){
+    riley_swc_array = model_obj@Parameters@swc_optional}
+  
+  if(model_obj@Parameters@Options@depth_override){
+    riley_depth_array = model_obj@Parameters@soil_layers$depths_optional}
+  
+  
+    #write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
+    #write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
+    #runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array)
     
   write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
   write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
-  runit2(model_obj, pat)
-  }
+  runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array)
   
   sumhead = read.csv(paste(model_obj@path,"sumheader.csv",sep=""), h = FALSE, colClasses=rep("character",33))
   datahead = read.csv(paste(model_obj@path,"dataheader.csv",sep=""), h = FALSE, colClasses=rep("character",70))
@@ -201,12 +214,14 @@ ez_leaderboard = function(){
       scorevec[ceiling(i/3)] = as.numeric(substr(pruned, starts1[i], stops1[i]))}}
 
   dfout = data.frame(Name = as.factor(namevec), Improvements = as.character(improvec), Points_Awarded = scorevec)
-  df2 = aggregate(dfout$Points_Awarded,  by=list(ID = dfout$Name), FUN=sum)
-  barplot(df2$x,
+  df2 = aggregate(. ~ Name, dfout, sum)[,-2]
+  df3  = df2[order(-df2$Points_Awarded),]
+  
+  barplot(df3$Points_Awarded,
           main = "ezSperry Beta Improvement -- Live Leaderboard",
           xlab = "Name",
           ylab = paste("Score as of ", Sys.time(), sep = ""),
-          names.arg = df2$ID,
+          names.arg = df3$Name,
           col = "slateblue1",
           horiz = FALSE) 
   

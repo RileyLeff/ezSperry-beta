@@ -1,0 +1,40 @@
+
+```{r}
+library(tidyverse)
+load("/Users/leff701/OneDrive - PNNL/Desktop/DRO_SVWC.RData")
+DRO_SVWC %>% filter(Date >= "2015-6-6")  
+DRO_SVWC$Pit_depth = as.factor(DRO_SVWC$Pit_depth)
+ritest = DRO_SVWC %>% filter(Date >= "2015-6-6" & Date <= "2016-6-6") %>% filter(Pit == 1)
+
+i = seq_len(nrow(ritest))
+breaks = seq(0, nrow(ritest), length(unique(ritest$Pit_depth)))
+inds = structure(split(i, cut(i, breaks)), names = NULL)
+
+formatted_vwcs = map(inds, ~ ritest$VWC[.x]) # this is the one-line conversion i was talking about, isn't it sick 
+
+####
+#  the first element in each sublist of formatted_vwcs represents pit depth 1 @ given time 
+# second element is pit depth 2 and so on 
+# each successive sublist is a snapshot of all depths for a given pit at a given timestamp (i filtered to just pit #1 for this test)
+# theoretically this scales to any number of pit depths since we're using length(unique(data))
+####
+```
+
+
+```{r}
+library(Rcpp)
+sourceCpp("/Users/leff701/OneDrive - PNNL/Desktop/ezSperry-beta/SperryModelBase.cpp") # source model brain
+source("/Users/leff701/OneDrive - PNNL/Desktop/ezSperry-beta/classes.R") # source model interface 
+
+model1 = new_sperry_model("/Users/leff701/OneDrive - PNNL/Desktop/ezSperry-beta/") # create a new model
+model1@Parameters@Options@alex_mode = TRUE
+model1@Parameters@Options@depth_override = TRUE
+# model1@Parameters@soil_layers$depths_optional layer depth can control beta/aspect now instead of the inverse
+model1@Parameters@Soil@n_layers = 4
+
+model1@Parameters@swc_optional = formatted_vwcs[1:1049] # just recycling the sperry data here as a test, trimming to the same number of timesteps 
+# Swc_optional should show as type "list" after running previous line.  items in column will look like this: <dbl[4]>
+run_sperry(model1)
+model1@Outputs@timesteps
+```
+
