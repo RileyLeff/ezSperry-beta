@@ -1385,7 +1385,7 @@ public:
           rough = 0.01; //soil Zm, eqn 14.9, using table 5.1 for smooth surface, cm
           zdispl = 6.5 * rough; //soil d, eqn 14.9, using d = 6.5 Zm, eq 5.2,5.3
            xh = riley_p_stand.slot("height_above_soil");//getValueFromNameDbl("i_soilXHeight") * 100.0; //Cells(12, 18) * 100 //height above soil surface for understory wind and gh in cm
-           xh = xh * 100.0;
+           xh = xh * 1; // riley:: goddamn it this was in centimeters but sperry's OG sheet said it was in meters. changed it to meters in the program. 
           zh = 0.2 * rough; //roughness for temperature
                             //rainsim = getValueFromName("i_rainEnable"); //Cells(11, 27) //y/n...turns on simulated rain
           //raining = getValueFromNameStr("i_rainEnable"); //[HNT] enable or disable OBSERVED rainfall (if //n// will ignore rain data)
