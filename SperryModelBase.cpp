@@ -1610,7 +1610,7 @@ public:
       klower = 0;
       pr = 0;
       threshold = 0;
-      kfactor;
+      // goes unused (kfactor)
       aamax = 0;
       dum = 0;
       kminleaf = 0;
@@ -1626,7 +1626,7 @@ public:
       soilred = "";
       dp = 0;
       kminplant = 0;
-      toplayer;
+      // unused (toplayer)
       p1 = 0;
       p2 = 0;
       pl = 0;
@@ -2044,7 +2044,7 @@ public:
          az = 6.28319 - az; //'correct for afternoon hours!
                             //'if zen < 1.57 { Cells(14 + i, 8) = az * 180 / pi//'output azimuth during day
                             //'dayl = (-Sin(lat) * sindec) / (Cos(lat) * Cos(dec))
-                            //'dayl = Atn(-dayl / Sqr(-dayl * dayl + 1)) + 2 * Atn(1)
+                            //'dayl = Atn(-dayl / Sqr(-dayl * dayl + 1)) + 2 * Atn(1)222
                             //'dayl = 2 * dayl / 15
                             //'Cells(14 + i, 9) = dayl * 180 / pi
       if (zen * 180 / pi < 90) { //'sun//'s up: calculate solar radiation
@@ -2197,7 +2197,7 @@ public:
                // RILEY :: swc override
                //Rcout << "before alex mode " << dd << " \n";
                //Rcout << "z " << z << " \n";
-               if(alex_mode & z > 0){
+               if(alex_mode & (z > 0)){
                  List this_it = ri_swc[dd-1];
                  //Rcout << "checkpoint a " << " \n";
                  //Rcout << "this_it is " << this_it << " \n";
@@ -4406,7 +4406,7 @@ public:
          assimilation(); //'gets sun layer photosynthesis
          assimilationshade(); //'gets shade layer photosynthesis
 
-      } while (!(sum == layers || test == 1 || night == "y" && (dd > 1 && !isNewYear) || check >= 500)); //'loop to complete failure unless it//'s night
+      } while (!(sum == layers || test == 1 || (night == "y" && (dd > 1 && !isNewYear)) || check >= 500)); //'loop to complete failure unless it//'s night
 
       if (chalk > 0) { //if//
          weird = 0; //'done our best
@@ -4600,7 +4600,7 @@ public:
          {
             swclimit[z] = swc(x); //'theta/thetasat at critical point
             // RILEY :: swc override
-            if(alex_mode & z > 0){
+            if(alex_mode & (z > 0)){
               List this_it = ri_swc[dd-1];
               double this_swc = this_it[z-1];
               swclimit[z] = this_swc;
