@@ -42,9 +42,9 @@ soillayerdf = data.frame(vg_a = c(765.3075,765.3075,765.3075,765.3075,765.3075),
 # params
 setClass("Soil", representation(field_cap_frac = "numeric", 
                                 init_p_field_cap = "numeric", rock_fraction = "numeric", soil_abs = "numeric",
-                                tlai_to_plai = "numeric", p_inc = "numeric", n_layers = "numeric"), 
+                                tlai_to_plai = "numeric", p_inc = "numeric"), 
          prototype(field_cap_frac = .5, init_p_field_cap = 100, rock_fraction = 0, 
-                   soil_abs = .94, tlai_to_plai = 3.82, p_inc = .00075, n_layers = 5))
+                   soil_abs = .94, tlai_to_plai = 3.82, p_inc = .00075))
 
 #####
 # ATMOSPHERE
@@ -68,8 +68,8 @@ setClass("Photosynthesis", representation(atm_co2_pa = "numeric", atm_co2_ppm = 
 # OPTIONS
 #####
 setClass("Options", representation(gw_p = "numeric", gw_d = "numeric", gw = "logical", 
-                                   soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical", weibin_mode = "logical", alex_mode = "logical", depth_override = "logical"), prototype(gw_p = 0, 
-                                                                                                                                                                                                                                            gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE, weibin_mode = FALSE, alex_mode = FALSE, depth_override = FALSE))
+                                   soil_redist = "logical", soil_evap = "logical", refilling = "logical", rain = "logical", use_gs_data = "logical", weibin_mode = "logical", alex_mode = "logical", depth_override = "logical", radius_override = "logical", soil_verbose = "logical"), prototype(gw_p = 0, 
+                                                                                                                                                                                                                                            gw_d = 1, gw = FALSE, soil_redist = FALSE, soil_evap = FALSE, refilling = FALSE, rain = FALSE, use_gs_data = FALSE, weibin_mode = FALSE, alex_mode = FALSE, depth_override = FALSE ,radius_override = FALSE, soil_verbose = FALSE))
 
 
 #####
@@ -145,6 +145,9 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   riley_lai_array = NA
   riley_swc_array = NA
   riley_depth_array = NA
+  riley_depth_array2 = NA
+  riley_radius_array = NA
+  riley_radius_array2 = NA
   
   if(model_obj@Parameters@Options@weibin_mode){
     riley_jmax_array = model_obj@data$Jmax_optional
@@ -156,10 +159,9 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   
   if(model_obj@Parameters@Options@depth_override){
     riley_depth_array = model_obj@Parameters@soil_layers$depths_optional
+    riley_depth_array2 = c(0.02)
+    riley_depth_array2[2:(length(riley_depth_array)+1)] = riley_depth_array
     
-    if(riley_depth_array[1] < 0.03){
-      stop("Parameter Error: First layer lower depth cannot be set below 0.03 meters")
-      }
     if(length(riley_depth_array) > 1){
       for(i in 1:(length(riley_depth_array)-1)){
         if(riley_depth_array[i+1] < riley_depth_array[i]){
@@ -168,9 +170,14 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
         }
       }
   }
+    if(model_obj@Parameters@Options@radius_override){
+      riley_radius_array = model_obj@Parameters@soil_layers$radii_optional
+      riley_radius_array2 = riley_radius_array[1]
+      riley_radius_array2[2:(length(riley_radius_array)+1)] = riley_radius_array
+    }
   
-    riley_depth_array2 = c(0.02)
-    riley_depth_array2[2:(length(riley_depth_array)+1)] = riley_depth_array
+  nlayers = nrow(model_obj@Parameters@soil_layers)
+    
     
     
   #write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
@@ -179,7 +186,7 @@ run_sperry = function(model_obj, dtt = deparse(substitute(model_obj))){
   
   write.csv(model_obj@data, paste(pat,"temp_data.csv",sep=""), quote = F, row.names = F)
   write.csv(model_obj@Parameters@gs_limits, paste(pat,"gs_lims_temp.csv",sep=""), quote = F, row.names = F)
-  runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2)
+  runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers)
   
   sumhead = read.csv(paste(model_obj@path,"sumheader.csv",sep=""), h = FALSE, colClasses=rep("character",33))
   datahead = read.csv(paste(model_obj@path,"dataheader.csv",sep=""), h = FALSE, colClasses=rep("character",70))

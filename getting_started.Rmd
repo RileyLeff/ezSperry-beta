@@ -7,15 +7,21 @@ output: html_document
 
 ```{r}
 library(Rcpp)
-sourceCpp("/Users/rileyleff/Desktop/eztest/SperryModelBase.cpp")
-source("/Users/rileyleff/Desktop/eztest/classes.R")
+sourceCpp("/Users/leff701/Documents/dev/ezSperry-beta/SperryModelBase.cpp")
+source("/Users/leff701/Documents/dev/ezSperry-beta/classes.R")
 ```
 
 ```{r}
-model1 = new_sperry_model("/Users/rileyleff/Desktop/eztest/")
+model1 = new_sperry_model("/Users/leff701/Documents/dev/ezSperry-beta/")
 run_sperry(model1)
-model1@Outputs@timesteps
 ```
+```{r}
+library(tidyverse)
+bci_temp = read.csv("/Users/leff701/Documents/data/bci_air_temp_91_to_20.csv")
+bci_solar = read.csv("/Users/leff701/Documents/data/bci_solar_2010to20.csv")
+```
+
+
 
 ```{r}
 # found a bug? shoot Riley a message and you'll increase your score on the leaderboard!

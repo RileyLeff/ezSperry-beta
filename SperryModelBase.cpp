@@ -208,9 +208,13 @@ NumericVector ri_v;
 NumericVector ri_l;
 List ri_swc;
 NumericVector ri_dep;
+NumericVector ri_rad;
 bool weibin_mode;
 bool alex_mode;
 bool depth_mode;
+bool radius_mode;
+bool soil_verbose_bro;
+int n_layers_riley;
 
 class ModelProgram
 {
@@ -918,7 +922,7 @@ public:
          std::cout << "FAILED to open DATA HEADER file " << headerFileName << std::endl;
       else
       {
-         std::cout << "Reading DATA HEADER file " << headerFileName << std::endl;
+         //std::cout << "Reading DATA HEADER file " << headerFileName << std::endl;
          if (headerFile >> dataHeaderRow) // should be the only row in the file
          {
             foundHeaderFile = true;
@@ -936,7 +940,7 @@ public:
          std::cout << "FAILED to open SUMMARY HEADER file " << headerFileName << std::endl;
       else
       {
-         std::cout << "Reading SUMMARY HEADER file " << headerFileName << std::endl;
+         //std::cout << "Reading SUMMARY HEADER file " << headerFileName << std::endl;
          if (sumHeaderFile >> summaryHeaderRow) // should be the only row in the file
          {
             foundSumHeaderFile = true;
@@ -961,7 +965,7 @@ public:
       if (!dataFile.is_open())
          std::cout << "FAILED to open DATA file " << dataFileName << std::endl;
 
-      std::cout << "Reading DATA file " << dataFileName << std::endl;
+      //std::cout << "Reading DATA file " << dataFileName << std::endl;
 
       // only want to read 30 years of data
       // long maxYears = 30; // change this to increase limit // moved to global
@@ -996,7 +1000,7 @@ public:
                   std::cout << "Read in " << yearCount - 1 << " years, quitting read." << std::endl;
                   break;
                }
-               std::cout << "Reading year " << curYear << " (" << yearCount << "/" << maxYears << ")" << std::endl;
+               // " << curYear << " (" << yearCount << "/" << maxYears << ")" << std::endl;
             }
 
             for (int rC = 0; rC < row.size(); rC++)
@@ -1118,7 +1122,7 @@ public:
 
           kmin = ksatp / 2000.0; //"instantaneous K" cutoff for global K(P) curves for each element
            aspect = riley_p_plant.slot("root_aspect_r");//getValueFromNameDbl("i_aspect"); //Cells(5, 12) //max radius of root system per max depth
-           layers = riley_p_soil.slot("n_layers");//getValueFromNameLng("i_layers"); //Cells(7, 12)
+           layers = n_layers_riley;//getValueFromNameLng("i_layers"); //Cells(7, 12)
                                                     //rootfunc = Cells(5, 12) //"y" if function is to be used, "n" if user sets layers
                                                     //if rootfunc = "y" { //use the root function
            beta = riley_p_plant.slot("root_beta");//getValueFromNameDbl("i_rootBeta"); //Cells(6, 12) //root beta for Y = 1 - B ^ d
@@ -1135,7 +1139,7 @@ public:
              paramCells[rowLR + k][colLR + 11] = std::to_string(layerDepths[k]);
           }
 
-
+         
           
           //depthmax = Cells(8 + layers, 11) //max depth in meters
           //depthmax = lSheet.Cells(rowLR + layers, colLR + 11) //max depth in meters
@@ -1211,14 +1215,14 @@ public:
           thetasat[0] = thetasat[1];
           depth[0] = 0.02; //sets top layer to 2 cm
 
-
+         if(soil_verbose_bro){
           // RILEY :: soil layer notice 
           Rcout << "" << std::endl; 
-          Rcout << "Note that program adds thin topsoil layer as 'layer 0' above what you specify as 'layer 1'" << std::endl;
-          Rcout << "This layer is rootless, 2cm thick, and has same properties as your specified 'layer 1'" << std::endl;
+          Rcout << "Note that program adds thin topsoil layer as 'layer 0' above what you specify as 'layer 1'." << std::endl;
+          Rcout << "This layer is rootless, 2cm thick, and has same properties and radius as your specified 'layer 1'." << std::endl;
           Rcout << "Finer control of this behavior will come when Riley has time.  You're stuck with 2cm topsoil for now." << std::endl;
           Rcout << "If you REALLY need to have control over those 2cm, one possible workaround is to set your 'layer 1' to a lower depth of 0.03 meters with the properties you want for the topsoil." << std::endl;
-          Rcout << "Then you can continue to add layers underneath at more reasonable depths" << std::endl;
+          Rcout << "Then you can continue to add layers underneath at more reasonable depths." << std::endl;
           Rcout << "" << std::endl;
           Rcout << "Note that your specified layer depths represent the depth at which each layer ends (lowest depth)." << std::endl;
           Rcout << "" << std::endl;
@@ -1233,8 +1237,9 @@ public:
           Rcout << "        Ends at:      " << "" << std::endl;
           Rcout << "        Total Length: " << "" << std::endl;
           Rcout << "        Radius:       " << "" << std::endl;
+          Rcout << "" << std::endl;
           // std::cout << "Layer " << k << " starts at " << layerDepths[k] << " and ends at " << xxxx[k] << std::endl;
-          }
+          }}
 
 
                            //now solve for kmax rhizosphere that gives the desired ave % rhizosphere resistance
@@ -5121,8 +5126,10 @@ long ModelProgram::modelProgramMain(S4 modelobj, std::string path9) //program st
 }
 
 // [[Rcpp::export]]
-int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0)
+int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0, NumericVector rad_vary = 0, int read_n_layers = 5)
 {
+    // RILEY :: n layers goin crazy in this bih
+    n_layers_riley = read_n_layers;
 
     // RILEY :: yo are we in weibin mode???? young sperrymodel he kinda vibin in weibin mode doe
     S4 r_p_1 = modelobj.slot("Parameters");
@@ -5136,7 +5143,7 @@ int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericV
         ri_l = lai_vary;
     }
 
-    // RILEY :: yo are we in alex mode???? young sperrymodel he kinda vibin in weibin mode doe
+    // RILEY :: yo are we in alex mode???? young sperrymodel he kinda vibin in alex mode doe
     alex_mode = r_o_1.slot("alex_mode");
 
     if(alex_mode){
@@ -5152,6 +5159,16 @@ int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericV
       ri_dep = dep_vary;
     }
 
+    // RILEY :: radius
+   radius_mode = r_o_1.slot("radius_override");
+
+    if(radius_mode){
+       Rcout << "Radius override is ACTIVATED.  Riley is feeling whimsical." << "\n";
+       ri_rad = rad_vary;
+    }
+
+   // RILEY :: verbosity 
+   soil_verbose_bro = r_o_1.slot("soil_verbose");
 
    // seed the random number generator with something crazy
    srand((unsigned)(time(0) * time(0)));

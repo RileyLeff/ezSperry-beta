@@ -1,0 +1,53 @@
+component pcrits
+  rhizocurves --> generates soil E(P) global curve -- only do this once
+    for each layer starting at layer 1
+      set p1 = 0
+      set k = 1
+      set e = 0 (flow integral)
+      set erh[z][0] = 0
+      set krh[z][0] = kmaxrh[z]
+
+      while krh[z][k-1] is NOT less than kmin
+        p2 = p1 + increment
+        qtrapvg(p1, p2, s)
+        e = e+s
+        erh[z][k] = e
+        x = p2
+        krh[z][k] = vg(x)
+        p1 = p2
+        k = k + 1
+        if (k == 100000)
+          break
+
+        pcritrh[z] = p2
+
+  qtrapvg() evaluates accuracy of vg integration
+    eps = 0.001 -> fractional refinement threshold for integral
+    tmax = 70 --> limit of calls to trapzdvg
+    olds = -1 ---> starting point unlikely to satisfy if statement below
+    for (t = 1; t <= tmax; t++)
+      trapzdvg(p1, p2, s, t);
+        if(abs(s - olds) < eps *( std::abs(olds))
+          return
+        olds = s
+
+trapzdvg() --> integrates van genuchten
+  if t ==1
+    s = 0.5 * p2-p1 * vg(p1) + vg(p2)
+    it = 1
+
+  else
+    tnm = it
+    del = (p2 - p1) / tnm;
+    x = p1 + 0.5 * del;
+    sum = 0
+    for (j = 1; j <= it; j++)
+      sum = sum + vg(x)
+      x = x+del
+    s = 0.5 * (s + (p2 - p1) * sum / tnm);
+    it = 2* it
+
+
+  vg --> van genuchten function for soil k
+    vp =
+    return kmaxrh[z] * a bunch of shit
