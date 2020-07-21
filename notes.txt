@@ -1,0 +1,12 @@
+rhizocurves --> generated curve for E(P) for soil (global, only need to do once)
+    NEEDS: kmaxrh[z], layer array, s, kmin
+    USES: qtrapvg, vg
+
+vg --> van genuchten function for soil k 
+reference https://hwbdocuments.env.nm.gov/Los%20Alamos%20National%20Labs/TA%2054/11569.pdf
+    for a given X, returns 
+        vp = 1 / (pow((a[z] * x), n[z]) + 1);
+        kmaxrh[z] * pow(vp, ((n[z] - 1) / (2 * n[z]))) * pow((pow((1 - vp), ((n[z] - 1) / n[z])) - 1), 2);)
+    
+wbr --> weibull function for root elements
+    ksatr[z] * exp(-(power((x / br), cr)))

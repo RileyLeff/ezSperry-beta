@@ -4,8 +4,6 @@
 using namespace Rcpp;
 //[[Rcpp::plugins("cpp11")]]
 
-
-
 #include <stdio.h>
 #include <cmath> // math utility functions
 #include <string> // the C++ String Class, easier to deal with than char arrays for this application
@@ -729,8 +727,6 @@ public:
       rowLR = getRowFromName("inputmarker_layer"); // not a typo -- the header marker for data is one above where it should be, but the header for layers is not .. the conventions here are a mess
       colLR = getColFromName("inputmarker_layer") - 1;
 
-      std::cout << "Name Table Test, rowLR = " << rowLR << std::endl;
-
       // an ugly hack to setup the column order
       dColYear = 1;
       dColDay = dColYear + 1;
@@ -822,7 +818,6 @@ public:
 
       name_scen = paramCells[21][2];
       name_model = paramCells[20][2];
-      std::cout << "Read site and scenario names (region | site | species | scenario | model): " << name_region << " | " << name_site << " | " << name_species << " | " << name_scen << " | " << name_model << std::endl;
 
       return true;
    }
@@ -1020,7 +1015,6 @@ public:
 
     void readin(S4 modelobj) //'inputs and calculates all parameters at the start
        {
-           Rcout << " Riley, you madlad, can't believe this works lmao ..." << "reading R data into c++ " << "\n";
 
            S4 riley_p = modelobj.slot("Parameters");
 
@@ -1078,9 +1072,7 @@ public:
           gmaxl = gmax * (1.0 / laperba) * (1 / 3600.0) * 55.56 * 1000.0; //convert to gmax per leaf area in mmol m-2s-1
                                                                           //'Cells(3, 13) = gmaxl
            alt = riley_p_stand.slot("site_elevation");//getValueFromNameDbl("i_elevation"); //Cells(13, 18) //elevation in m
-           Rcout << " Time for param check " << "\n";
-           Rcout <<  alt << "\n";
-           Rcout << "Is that what you wanted to see? " << "\n";
+
           patm = 101.325 * pow((1 - 0.0065 * alt / (288.15 + 0.0065 * alt)), 5.257); //atmospheric pressure, T = 15 C, average sealevel patm; approximation
                                                                                      //Call setValueFromName("o_atmP", patm) //Cells(1, 18) = patm //atmospheric pressure in kPa
 
@@ -1134,23 +1126,17 @@ public:
                                                     //for this soil data we want to use the original anchor-offset system
 
           double layerDepths[20];  // FUCKUP UPPER BOUND
+
           for (k = 1; k <= layers; k++) //set layer depths and % root ksat
           {
              //Cells(8 + k, 2) = 100 * (0.995 / layers) //equal % roots per layer
              //Cells(8 + k, 11) = 0.01 * Log(1 - k * 0.995 / layers) / Log(beta) //lower depth of each layer converted to m
              layerDepths[k] = 0.01 * log(1.0 - k * 0.995 / layers) / log(beta); //lower depth of each layer converted to m
              paramCells[rowLR + k][colLR + 11] = std::to_string(layerDepths[k]);
-             // RILEY :: override time boys
-             if(depth_mode){
-               layerDepths[k] = ri_dep[k];
-             } // override over for here
           }
-          std::cout << "Hi Sperry Model user, layer depths are currently as follows." << std::endl;
 
-          for (k = 1; k <= layers; k++)
-          {
-          std::cout << "Layer " << k << " has a depth of " << layerDepths[k] << std::endl;
-          }
+
+          
           //depthmax = Cells(8 + layers, 11) //max depth in meters
           //depthmax = lSheet.Cells(rowLR + layers, colLR + 11) //max depth in meters
           depthmax = layerDepths[layers];
@@ -1159,10 +1145,9 @@ public:
           for (k = 1; k <= layers * 2.0; k++)
           {
              vertdistance[k] = 0.01 * log(1 - k * 0.995 / (layers * 2.0)) / log(beta); //get half depths
-             if(depth_mode){
-               layerDepths[k] = ri_dep[k]/2;
-             } // override over for here
           }
+
+
           i = 0;
           for (k = 1; k <= layers * 2; k += 2) // To layers * 2 Step 2
           {
@@ -1217,12 +1202,41 @@ public:
               thetasat[k] = ri_theta_sat[k - 1];//atof(paramCells[rowLR + k][colLR + 6].c_str()); //theta sat in volume/volume
              thetasat[k] = thetasat[k] * rockfrac; //reduce for actual rock-free fraction of soil
           }
+
+
           //now add toplayer (layer 0) of rootless soil 2 cm thick w. same properties as layer 1
           a[0] = a[1];
           n[0] = n[1];
           kkmax[0] = kkmax[1];
           thetasat[0] = thetasat[1];
           depth[0] = 0.02; //sets top layer to 2 cm
+
+
+          // RILEY :: soil layer notice 
+          Rcout << "" << std::endl; 
+          Rcout << "Note that program adds thin topsoil layer as 'layer 0' above what you specify as 'layer 1'" << std::endl;
+          Rcout << "This layer is rootless, 2cm thick, and has same properties as your specified 'layer 1'" << std::endl;
+          Rcout << "Finer control of this behavior will come when Riley has time.  You're stuck with 2cm topsoil for now." << std::endl;
+          Rcout << "If you REALLY need to have control over those 2cm, one possible workaround is to set your 'layer 1' to a lower depth of 0.03 meters with the properties you want for the topsoil." << std::endl;
+          Rcout << "Then you can continue to add layers underneath at more reasonable depths" << std::endl;
+          Rcout << "" << std::endl;
+          Rcout << "Note that your specified layer depths represent the depth at which each layer ends (lowest depth)." << std::endl;
+          Rcout << "" << std::endl;
+          Rcout << "Soil Layer Info:" << std::endl;
+          Rcout << "" << std::endl;
+
+          for (k = 0; k <= layers; k++)
+          {
+          Rcout << "Layer " << k << ":" << std::endl;
+          Rcout << "        Begins at:    " << "" << std::endl;
+          Rcout << "        Midpoint at:  " << "" << std::endl;
+          Rcout << "        Ends at:      " << "" << std::endl;
+          Rcout << "        Total Length: " << "" << std::endl;
+          Rcout << "        Radius:       " << "" << std::endl;
+          // std::cout << "Layer " << k << " starts at " << layerDepths[k] << " and ends at " << xxxx[k] << std::endl;
+          }
+
+
                            //now solve for kmax rhizosphere that gives the desired ave % rhizosphere resistance
            rhizotarg = riley_p_plant.slot("avg_p_rhizo_r");//getValueFromNameDbl("i_rhizoPer") / 100.0; //Cells(4, 9) / 100 //average fraction of whole plant resistance in rhizosphere(maximum soil limitation)
            rhizotarg = rhizotarg / 100.0;
@@ -4231,6 +4245,9 @@ public:
 
    long modelTimestepIter(long &VBA_dd)
    {
+
+    Rcpp::checkUserInterrupt();
+
       dd = VBA_dd;
 
       if (dd == 1 || isNewYear)
