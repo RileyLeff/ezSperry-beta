@@ -1237,6 +1237,9 @@ public:
           Rcout << "" << std::endl; 
           Rcout << "Soil Layer Info:" << std::endl;
           Rcout << "" << std::endl;
+          if(depth_mode){
+          Rcout << "depth override is ON." << std::endl;
+          }
 
           for (k = 1; k <= layers; k++)
           {
