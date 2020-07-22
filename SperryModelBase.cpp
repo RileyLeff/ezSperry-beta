@@ -1137,10 +1137,11 @@ public:
              //Cells(8 + k, 11) = 0.01 * Log(1 - k * 0.995 / layers) / Log(beta) //lower depth of each layer converted to m
              layerDepths[k] = 0.01 * log(1.0 - k * 0.995 / layers) / log(beta); //lower depth of each layer converted to m
              paramCells[rowLR + k][colLR + 11] = std::to_string(layerDepths[k]);
+             if(depth_mode){
+                layerDepths[k] = ri_dep[k];
+             }
           }
 
-         
-          
           //depthmax = Cells(8 + layers, 11) //max depth in meters
           //depthmax = lSheet.Cells(rowLR + layers, colLR + 11) //max depth in meters
           depthmax = layerDepths[layers];
@@ -1149,8 +1150,10 @@ public:
           for (k = 1; k <= layers * 2.0; k++)
           {
              vertdistance[k] = 0.01 * log(1 - k * 0.995 / (layers * 2.0)) / log(beta); //get half depths
+             
           }
 
+        
 
           i = 0;
           for (k = 1; k <= layers * 2; k += 2) // To layers * 2 Step 2
@@ -1158,6 +1161,18 @@ public:
              i = i + 1;
              vertdistance[i] = vertdistance[k]; //take every other vertdistance
           }
+
+           if(depth_mode){
+            for(k = 1; k <= layers; k++){
+                if(k == 1){
+                   vertdistance[k] = layerDepths[k] / 2;
+                } 
+                  else{
+                     vertdistance[k] = layerDepths[k-1] + ((layerDepths[k] - layerDepths[k-1]) / 2);
+                  }
+             }
+         }
+
           //now get radial distances
           for (k = 1; k <= layers; k++) //To layers //get thicknesses
           {
@@ -1215,28 +1230,23 @@ public:
           thetasat[0] = thetasat[1];
           depth[0] = 0.02; //sets top layer to 2 cm
 
+
+
          if(soil_verbose_bro){
           // RILEY :: soil layer notice 
           Rcout << "" << std::endl; 
-          Rcout << "Note that program adds thin topsoil layer as 'layer 0' above what you specify as 'layer 1'." << std::endl;
-          Rcout << "This layer is rootless, 2cm thick, and has same properties and radius as your specified 'layer 1'." << std::endl;
-          Rcout << "Finer control of this behavior will come when Riley has time.  You're stuck with 2cm topsoil for now." << std::endl;
-          Rcout << "If you REALLY need to have control over those 2cm, one possible workaround is to set your 'layer 1' to a lower depth of 0.03 meters with the properties you want for the topsoil." << std::endl;
-          Rcout << "Then you can continue to add layers underneath at more reasonable depths." << std::endl;
-          Rcout << "" << std::endl;
-          Rcout << "Note that your specified layer depths represent the depth at which each layer ends (lowest depth)." << std::endl;
-          Rcout << "" << std::endl;
           Rcout << "Soil Layer Info:" << std::endl;
           Rcout << "" << std::endl;
 
-          for (k = 0; k <= layers; k++)
+          for (k = 1; k <= layers; k++)
           {
           Rcout << "Layer " << k << ":" << std::endl;
-          Rcout << "        Begins at:    " << "" << std::endl;
-          Rcout << "        Midpoint at:  " << "" << std::endl;
-          Rcout << "        Ends at:      " << "" << std::endl;
-          Rcout << "        Total Length: " << "" << std::endl;
-          Rcout << "        Radius:       " << "" << std::endl;
+          Rcout << "        Midpoint at:        " << vertdistance[k] << std::endl;
+          Rcout << "        Ends at:            " << layerDepths[k] << std::endl;
+          Rcout << "        Radius:             " << radius[k] << std::endl;
+          Rcout << "        Volume:             " << vol << std::endl;
+          Rcout << "        Rel Transport Dist: " << length[k] << std::endl;
+          Rcout << "" << std::endl;
           Rcout << "" << std::endl;
           // std::cout << "Layer " << k << " starts at " << layerDepths[k] << " and ends at " << xxxx[k] << std::endl;
           }}
