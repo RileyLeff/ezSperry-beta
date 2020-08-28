@@ -120,5 +120,5 @@ setClass("Sperry_Output", representation(summary = "data.frame", timesteps = "da
 # MODEL PARENT
 #####
 setClass("Sperry_Model", representation(Parameters = "Sperry_Parameters", data = "data.frame", 
-                                        Outputs = "Sperry_Output", path = "character"), prototype(data = sp_data_df_, path = "/Users/rileyleff/Desktop/eztest/"))
+                                        Outputs = "Sperry_Output"), prototype(data = sp_data_df_))
 

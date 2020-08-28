@@ -1,4 +1,5 @@
-.phonebook = read.csv("inst/extdata/output_phonebook.csv")
+
+.phonebook = read.csv(system.file("extdata", "output_phonebook.csv", package = "ezsperry"))
 .fff = function(x,y,z) list(cposition = x, units = y, description = z)
 .cpos2 = purrr::pmap(list(.phonebook$cposition, .phonebook$units, .phonebook$description), .fff)
 

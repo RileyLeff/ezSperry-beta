@@ -1,4 +1,4 @@
-install_github("rileyleff/ezSperry-beta", ref = "pack")
+devtools::install_github("rileyleff/ezSperry-beta", ref = "pack")
 
 
 
