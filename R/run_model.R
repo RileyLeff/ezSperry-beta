@@ -50,21 +50,30 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
     
     runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
     
-    
-    
-    xxx = as.data.frame(model_obj@Outputs@timesteps[1:42])
-    xxx$psiroot_layers = model_obj@Outputs@timesteps$fuckpl
-    xxx$kroot_layers = model_obj@Outputs@timesteps$fuckkl
-    xxx$eroot_layers = model_obj@Outputs@timesteps$fuckel
+    #xxx = as.data.frame(model_obj@Outputs@timesteps[1:42])
+    #xxx$psiroot_layers = model_obj@Outputs@timesteps$fuckpl
+    #xxx$kroot_layers = model_obj@Outputs@timesteps$fuckkl
+    #xxx$eroot_layers = model_obj@Outputs@timesteps$fuckel
 
-    eval(parse(text = paste(.dtt,"@Outputs@timesteps <<- xxx")))
+    #eval(parse(text = paste(.dtt,"@Outputs@timesteps <<- xxx")))
     
-    if(bounce){
-        if(skinny){
-            return(xxx)
-        } else{
-        return(model_obj)
-        }
-    }
+    #if(bounce){
+    #    if(skinny){
+    #        return(xxx)
+    #    } else{
+    #    return(model_obj)
+     #   }
+    #}
 }
+
+cleanup_sperry = function(z){
+    xxx = as.data.frame(z[1:42])
+    xxx$psiroot_layers = z$fuckpl
+    xxx$kroot_layers = z$fuckkl
+    xxx$eroot_layers = z$fuckel
+    return(xxx)
+}
+
+
+
 
