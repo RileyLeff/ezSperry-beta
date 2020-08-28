@@ -11,6 +11,8 @@ rm(.phonebook)
 .cpos2[[30]]$cposition = c(45,46,47,48,49)
 .cpos2[[32]]$cposition = c(51,52,53,54,55)
 
+
+
 sperrylookup = function(label, choice = "units"){
     if(!label %in% names(.cpos2)) {message("not in phonebook, check your spelling")
         stop()}
