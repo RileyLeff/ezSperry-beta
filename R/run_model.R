@@ -1,4 +1,4 @@
-run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce = FALSE, skinny = FALSE, nametag = "rileyiscool"){
+run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce = FALSE, skinny = FALSE, nametag = "rileyiscool", returnNA = FALSE, returnnull = FALSE){
 
     riley_jmax_array = NA
     riley_vmax_array = NA
@@ -57,13 +57,19 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
 
     #eval(parse(text = paste(.dtt,"@Outputs@timesteps <<- xxx")))
     
-    #if(bounce){
-    #    if(skinny){
-    #        return(xxx)
-    #    } else{
-    #    return(model_obj)
-     #   }
-    #}
+    if(bounce){
+        if(skinny){
+            return(xxx)
+        } else{
+        return(model_obj)
+        }
+    }
+    if(returnNA){
+        return(NA)
+    }
+    if(returnnull){
+        return(NULL)
+    }
 }
 
 
