@@ -665,11 +665,11 @@ public:
       }
    }
 
-   bool locateRanges(std::string path9)
+   bool locateRanges()
    {
       // set the parameter and nametable filenames
-      std::string paramFileName = path9 + "parameters.csv";
-      std::string nameTableFileName = path9 + "nametable.csv";
+      std::string paramFileName = "parameters.csv";
+      std::string nameTableFileName = "nametable.csv";
 
       //std::cout << "Reading parameters from " << paramFileName << std::endl;
 
@@ -836,7 +836,7 @@ public:
 
    const long maxYears = 90;
 
-   void readGSSheet(std::string path9)
+   void readGSSheet()
    {
       memset(GSCells, 0, sizeof(GSCells));
 
@@ -844,7 +844,7 @@ public:
 
       if (stage_ID == STAGE_ID_NONE)
       {
-         GSFileName = path9 + "gs_lims_temp.csv";
+         GSFileName =  "gs_lims_temp.csv";
       }
 
       if (useGSData && GSFileName != "") // only if we actually selected a file, and we're using the GS data files in the first place
@@ -976,11 +976,11 @@ public:
             }
 
 
-   void readDataSheet(std::string path9)
+   void readDataSheet()
    {
       // try to find a header file
       bool foundHeaderFile = false;
-      std::string headerFileName = path9 + "dataheader.csv";
+      std::string headerFileName =  "dataheader.csv";
 
       //std::cout << "Reading data header." << std::endl;
 
@@ -998,7 +998,7 @@ public:
       }
 
       bool foundSumHeaderFile = false;
-      headerFileName = path9 + "sumheader.csv";
+      headerFileName = "sumheader.csv";
 
       //std::cout << "Reading summary header." << std::endl;
 
@@ -1019,11 +1019,11 @@ public:
 
       memset(dataCells, 0, sizeof(dataCells));
 
-      std::string dataFileName = path9 + "temp_data_" + globalnametag+ ".csv";
+      std::string dataFileName =  "temp_data_" + globalnametag+ ".csv";
 
       if (stage_ID == STAGE_ID_NONE)
       {
-         dataFileName = path9 + "temp_data"+ globalnametag+ ".csv";
+         dataFileName =  "temp_data"+ globalnametag+ ".csv";
       }
 
       //std::cout << "Reading data set." << std::endl;
@@ -4899,34 +4899,18 @@ public:
 
     void riley_data_out(S4 modelobj)
     {
+      // magic numbers 10-14, 45-49, 51-55
+      int riarr[42] = {15,10,16,17,18,19,20,21,23,24,25,26,27,28,29,30,32,33,34,35,37,38,39,40,41,42,43,
+                      44,45,50,51,58,61,62,63,64,65,66,67,68,69,70};
 
-      std::string dh_fuck[] = {
-        "year",	"julian_day",	"standard_time",	"solar_w_m-2",	"rain_mm",
-        "wind_m_s-1",	"t_air_c",	"t_soil_c",	"d_md_kpa",	"p1_mpa",
-        "p2_mpa",	"p3_mpa",	"p4_mpa",	"p5_mpa",	"pd_mpa",
-        "p_mpa", "e_mmol_m-2_s-1",	"gw_mmol_m-2_s-1",	"leaf_air_vpd_kpa",	"leaf_temp"	,
-       "anet_per_leaf_area_umol_s-1_m-2",	"",	"ci_pa",	"ppfd_sun",	"p_mpa",
-       "e_mmol_m-2_s-1",	"gw_mmol_m2_s-1",	"leaf_air_vpd_kpa", "leaftempt",	"anet_umol_s-1_m-2",
-       "",	"ci_pa",	"ppfd_shade",	"e_tree",	"anet_tree_per_leaf_area_umol_s-1_m-2",
-       "",		"pcrit_mpa",	"ecrit",	"pstem_MPa",	"proot_mpa",
-       "kstem_kg_hr-1_m-2", "kleaf_kg_hr-1_m-2",	"kplant_kg_hr-1_m-2",	"kxylem_kg_hr-1_m-2",	"kroot1_kg_hr-1_m-2",
-       "kroot2_kg_hr-1_m-2",	"kroot3_kg_hr-1_m-2",	"kroot4_kg_hr-1_m-2",	"kroot5_kg_hr-1_m-2",	"kroot_all_kg_hr-1_m-2",
-       "e_root1_mmol_s-1_m-2_leafarea_aka_soil_to_root_flux",	"e_root2_mmol_s-1_m-2_leafarea_aka_soil_to_root_flux",	"e_root3_mmol_s-1_m-2_leafarea_aka_soil_to_root_flux",	"e_root4_mmol_s-1_m-2_leafarea_aka_soil_to_root_flux", "e_root5_mmol_s-1_m-2_leafarea_aka_soil_to_root_flux",
-       "", "", "water_content_mm","water_content_delta_mm_timestep-1","rain_mm_timestep-1",
-       "groundwater_input_mm_timestep-1",	"e_mm_timestep-1", "drainage_mm_timestep-1",	"soil_evap_mm_timestep-1",	"et_mm_timestep-1",
-       "anet_per_leaf_area_mmol_timestep-1_m-2",	"total_water_input_mm_timestep-1",	"plc_plant",	"plc_xylem",	"runoff_mm_timestep-1"
-     }; // blanks at 22 31 36 56 57 --- no dups --- count is 70 including blanks/dups
-
-      std::string sh_fuck[33] = {
-        "year",	"total_water_input_mm",	"anet_total_per_leaf_area_mmol_yr-1_m-2",	"e_total_mm3_per_mm2_ground_area_per_year",	"plc_max_whole_plant",
-        "plc_xylem_max",	"k_min_whole_plant",	"k_xylem_min_kg_hr-1m-2",	"et_total_mm3_per_mm2_ground_area_per_year",	"rain_option",
-        "gwater_option",	"starting_fraction_of_field_capacity",	"gw_dist_below_roots",	"hrs_over_plc85",	"ba_to_ga_m2_ha-1",
-        "la_to_ba_m2_to_m2",	"mean_plc_whole_plant", "", "", "prev_gs_end_water_cont_mm",
-        "prev_offseason_input_mm",	"prev_offseason_end_content_mm", "gs_start_water_content_mm","gs_input_mm",	"gs_end_water_content_mm", "num_nr_fails",	"avg_water_cont_during_NR_fail_mm",
-        "max_water_content_during_nr_fail_mm",	"",	"mean_ci_to_ca",	"",	"a_weighted_ci_pa",	"a_weighted_ci_over_ca"
-
-      }; //blanks at 18,19,29,31 --- no dups -- count is 33 including blanks/dups
-
+      std::string riname[42] = {"predawn","psiroot_layers","sun_psimd","sun_e","sun_gw",
+                                  "sun_l2a_vpd","sun_leaftemp","sun_anet","sun_ci","sun_ppfd",
+                                  "sh_psi","sh_e","sh_gw","sh_l2a_vpd","sh_leaftemp","sh_anet",
+                                  "sh_ci","sh_ppfd","tree_e","tree_anet","tree_pcrit","tree_ecrit",
+                                  "pstem","proot","kstem","kleaf","kplant",
+                                  "kxylem","kroot_layers","kroot_all","eroot_layers","water_content","gwater_input",
+                                  "e_mm","drainage","soil_evap","evapot_mmol","anet_mmol","total_water_input",
+                                  "plc_plant","plc_xylem","runoff"};
 
         DataFrame ts_out_df = DataFrame::create();
          DataFrame su_out_df = DataFrame::create();
@@ -4937,25 +4921,18 @@ public:
         int ncol_datahead = 70;
         int ncol_sumhead = 33;
 
-        int exclude_dh[5] = {22,31,36,56,57};
-        int exclude_sh[5] = {18,19,29,31};
 
 
-        int arr[] = {10,20,30,40,50,60};
-        int arrSize = sizeof(arr)/sizeof(arr[0]);
 
-        for(int coln=1; coln < ncol_datahead + 1; coln++){
-          if(coln == exclude_dh[0] || coln == exclude_dh[1] || coln == exclude_dh[2] || coln == exclude_dh[3] || coln == exclude_dh[4]){
-            continue;
-          }
+        for(int coln=0; coln < sizeof(riarr); coln++){
           NumericVector otto {};
-          for(int rown=2; rown < dd+3; rown++){
-            otto.push_back(dataCells[rown][coln]);
-          }
-          ts_out_df.push_back(otto, dh_fuck[coln-1]);
+            for(int rown = 2; rown < dd+3; rown++){
+              otto.push_back(dataCells[rown][riarr[coln]]);
+            }
+              ts_out_df.push_back(otto, riname[coln]);
         }
 
-
+  /*
         for(int coln=1; coln < ncol_sumhead + 1; coln++){
           if(coln == exclude_sh[0] || coln == exclude_sh[1] || coln == exclude_sh[2] || coln == exclude_sh[3]){
               continue;
@@ -4966,7 +4943,7 @@ public:
           }
           su_out_df.push_back(ozzy, sh_fuck[coln-1]);
         }
-    /*
+
 
          for(int i=2; i < dd+3; i++){
            NumericVector otto(dataCells[i]+1,dataCells[i]+71);
@@ -5066,18 +5043,18 @@ public:
       }
    }
 
-   long modelProgramMain(S4 modelobj, std::string path9); //program starts here
+   long modelProgramMain(S4 modelobj); //program starts here
 };
 
 ModelProgram mainProg;
 //ModelProgram backup[2];
 
-long ModelProgram::modelProgramMain(S4 modelobj, std::string path9) //program starts here
+long ModelProgram::modelProgramMain(S4 modelobj) //program starts here
 {
    //Dim ddOutMod As Long // moved to module global
    memset(finalOutCells, 0, sizeof(finalOutCells)); // clear the final outputs data. Normal data sheets get cleared on each iteration, but this one only per-run
 
-   bool lrSuccess = locateRanges(path9); //Finds all of the input/output sections across the workbook
+   bool lrSuccess = locateRanges(); //Finds all of the input/output sections across the workbook
                                     // In the C++ version, also loads parameter file and "nametable" for parameters
 
    if (!lrSuccess)
@@ -5282,7 +5259,7 @@ long ModelProgram::modelProgramMain(S4 modelobj, std::string path9) //program st
 }
 
 // [[Rcpp::export]]
-int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0, NumericVector rad_vary = 0, int read_n_layers = 5, std::string nametag = "spemo", int riyc = 0, int rinr = 0)
+int runit2(S4 modelobj, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0, NumericVector rad_vary = 0, int read_n_layers = 5, std::string nametag = "spemo", int riyc = 0, int rinr = 0)
 {
     // RILEY :: riley logging on time to make this code worse :)
     // if I had just learned C++ or Rust thoroughly instead of halfway I could've written a really good model
@@ -5303,6 +5280,8 @@ int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericV
 
     // RILEY :: n layers goin crazy in this bih
     n_layers_riley = read_n_layers;
+
+    // Riley is fucked
 
     // RILEY :: yo are we in weibin mode???? young sperrymodel he kinda vibin in weibin mode doe
     S4 r_p_1 = modelobj.slot("Parameters");
@@ -5360,7 +5339,7 @@ int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary = 0, NumericV
 
    // to do a normal run that's only based on local folder parameter sheet settings, set the stage_ID to zero
    mainProg.stage_ID = STAGE_ID_NONE;
-   result = mainProg.modelProgramMain(modelobj, path9); // for returning failure error codes... not really used in this version
+   result = mainProg.modelProgramMain(modelobj); // for returning failure error codes... not really used in this version
 
    if (!result)
    {

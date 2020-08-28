@@ -1,0 +1,44 @@
+label,cposition,units,description
+posi,,time,"R-friendly way to represent time units. See packages like Lubridate to extract info & perform calculations easily in this format. Since output is matched with the data input timesteps, you can use the same index to grab the input date format from @data if you prefer."
+predawn,15,MPa,predawn water potential
+psiroot_layers,,MPa,"soil water potentials for rooted layers.  formatted as a list --  for example, access the first layer swp with modelname@Outputs@timesteps$psi_layers[[1]]"
+sun_psimd,16,MPa,midday water potential for leaves in the SUN
+sun_e,17,mmol / (m2 * s),midday transpiration for leaves in the SUN
+sun_gw,18,mmol / (m2 * s),midday canopy diffusive conductance to water for leaves in the SUN
+sun_l2a_vpd,19,kPa,leaf-to-air vapor pressure deficit for leaves in the SUN
+sun_leaftemp,20,c,leaf temperature for leaves in the SUN
+sun_anet,21,umol / (m2 * s),photosynthetic CO2 assimilation rate for leaves in the SUN
+sun_ci,23,Pa,partial pressure of intracellular CO2 for leaves in the SUN
+sun_ppfd,24,umol / (m2 * s),photosynthetic photon flux density for leaves in the SUN
+sh_psi,25,MPa,midday water potential for leaves in the SHADE
+sh_e,26,mmol / (m2 * s),midday transpiration for leaves in the SHADE
+sh_gw,27,mmol / (m2 * s),midday canopy diffusive conductance to water for leaves in the SHADE
+sh_l2a_vpd,28,kPa,leaf-to-air vapor pressure deficit for leaves in the SHADE
+sh_leaftemp,29,c,leaf temperature for leaves in the SHADE
+sh_anet,30,umol / (m2 * s),photosynthetic CO2 assimilation rate for leaves in the SHADE
+sh_ci,32,Pa,partial pressure of intracellular CO2 for leaves in the SHADE
+sh_ppfd,33,umol / (m2 * s),photosynthetic photon flux density for leaves in the SHADE
+tree_e,34,mmol / (m2 * s),midday transpiration for the whole tree -- weighted average between sun & shade leaves
+tree_anet,35,umol / (m2 * s),photosynthetic CO2 assimilation rate for whole tree weighted average between sun & shade leaves
+tree_pcrit,37,MPa,the water potential threshold beyond which the whole system will experience hydraulic failure (i.e. whole-tree-scale)
+tree_ecrit,38,mmol / (m2 * s),transpiration threshold beyond which the whole system will experience hydraulic failure (i.e. whole-tree-scale)
+pstem,39,MPa,water potential of the stem
+proot,40,MPa,water potential of the root system
+kstem,41,kg / (m2 * hr),conductivity of the stem element
+kleaf,42,kg / (m2 * hr),conductivity of the leaf element
+kplant,43,kg / (m2 * hr),conductivity of the whole plant
+kxylem,44,kg / (m2 * hr),conductivity of the xylem element
+kroot_layers,,kg / (m2 * hr),"conductivity for rooted layers.  formatted as a list --  for example, access the first layer k with modelname@Outputs@timesteps$kroot_layers[[1]]"
+kroot_all,50,kg / (m2 * hr),total root conductivity at midday (sum of all layer k).  area is basal area
+eroot_layers,,mmol / (m2 * s),"soil to root flux for each layer.  For some reason, the ""per square meters"" part of the units is actually ""per square meters leaf area"".  not sure if that makes sense"
+water_content,58,mm / m2,root zone water content.  per unit area of ground
+gwater_input,61,mm / timestep,groundwater input in mm per timestep
+e_mm,62,mm / (timestep * m2),transpiration per ground area in mm m-2 per timestep
+drainage,63,mm / timestep,excess root zone water per timestep in mm
+soil_evap,64,mm / timestep,evaporative water loss in mm per timestep
+evapot_mmol,65,mm / timestep,evapotranspiration (total water transpired from tree and from soil evaporation.  allegedly mm per timestep but i am not confident in the program's unit conversion on this one
+anet_mmol,66,mmol/(timestep * m2),anet per timestep in mmol
+total_water_input,67,mm / timestep,sum of rain and groundwater per timestep
+plc_plant,68,percent loss of conductivity,"percent loss of conductivity, whole plant"
+plc_xylem,69,percent loss of conducivity,"percent loss of conductivity, xylem only"
+runoff,70,mm / timestep,excess root zone water in mm per timestep

@@ -1,4 +1,4 @@
-.phonebook = read.csv("inst/extdata/output_phonebook.csv")
+.phonebook = read.csv("~/Desktop/output_phonebook.csv")
 .fff = function(x,y,z) list(cposition = x, units = y, description = z)
 .cpos2 = purrr::pmap(list(.phonebook$cposition, .phonebook$units, .phonebook$description), .fff)
 

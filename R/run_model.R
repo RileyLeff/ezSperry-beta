@@ -48,7 +48,7 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
     riyc = length(unique(model_obj@data$Year))
     rinr = nrow(model_obj@data)
     
-    runit2(model_obj, pat, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
+    runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
     
     if(bounce){
         if(skinny){
