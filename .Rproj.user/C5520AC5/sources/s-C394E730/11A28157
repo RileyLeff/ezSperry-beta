@@ -3,7 +3,7 @@
     "path": "~/Desktop/ezsperry/R/run_model.R",
     "project_path": "R/run_model.R",
     "type": "r_source",
-    "hash": "112137164",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1598591736660.0,
@@ -11,15 +11,15 @@
     "relative_order": 3,
     "properties": {
         "tempName": "Untitled1",
-        "cursorPosition": "50,20",
-        "scrollLine": "26"
+        "cursorPosition": "66,0",
+        "scrollLine": "17"
     },
     "folds": "",
-    "lastKnownWriteTime": 1598598002,
+    "lastKnownWriteTime": 1598607461,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1598598002641,
+    "last_content_update": 1598607461619,
     "read_only": false,
     "read_only_alternatives": []
 }

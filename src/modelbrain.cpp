@@ -219,6 +219,7 @@ std::string globalnametag;
 int riley_year_count;
 int riley_nr_chillin;
 
+
 class ModelProgram
 {
 public:
@@ -734,7 +735,7 @@ public:
       rowLR = 60; //getRowFromName("inputmarker_layer"); // not a typo -- the header marker for data is one above where it should be, but the header for layers is not .. the conventions here are a mess
       colLR = 0; // getColFromName("inputmarker_layer") - 1;
 
-      Rcout << "rowd, cold, rowlr, collr: " << rowD << " " << colD << " " << rowLR << " " << colLR << " \n";
+
 
       // an ugly hack to setup the column order
       dColYear = 1;
@@ -4905,32 +4906,63 @@ public:
 
       std::string riname[42] = {"predawn","psiroot_layers","sun_psimd","sun_e","sun_gw",
                                   "sun_l2a_vpd","sun_leaftemp","sun_anet","sun_ci","sun_ppfd",
-                                  "sh_psi","sh_e","sh_gw","sh_l2a_vpd","sh_leaftemp","sh_anet",
-                                  "sh_ci","sh_ppfd","tree_e","tree_anet","tree_pcrit","tree_ecrit",
+                                  "sh_psi","sh_e","sh_gw","sh_l2a_vpd","sh_leaftemp",
+                                  "sh_anet",
+                                  "sh_ci","sh_ppfd","tree_e","tree_anet","tree_pcrit",
+                                  "tree_ecrit",
                                   "pstem","proot","kstem","kleaf","kplant",
-                                  "kxylem","kroot_layers","kroot_all","eroot_layers","water_content","gwater_input",
-                                  "e_mm","drainage","soil_evap","evapot_mmol","anet_mmol","total_water_input",
+                                  "kxylem","kroot_layers","kroot_all","eroot_layers","water_content",
+                                  "gwater_input",
+                                  "e_mm","drainage","soil_evap","evapot_mmol","anet_mmol",
+                                  "total_water_input",
                                   "plc_plant","plc_xylem","runoff"};
 
         DataFrame ts_out_df = DataFrame::create();
-         DataFrame su_out_df = DataFrame::create();
+         //DataFrame su_out_df = DataFrame::create();
 
         Rcout << "dd is " << dd << " \n";
         Rcout << "yearCount is " << yearCount << " \n";
 
         int ncol_datahead = 70;
-        int ncol_sumhead = 33;
+        //int ncol_sumhead = 33;
 
-
-
-
-        for(int coln=0; coln < sizeof(riarr); coln++){
+        for(int coln=0; coln < 42; coln++){
           NumericVector otto {};
+
             for(int rown = 2; rown < dd+3; rown++){
+              int wowindex = riarr[coln];
               otto.push_back(dataCells[rown][riarr[coln]]);
             }
               ts_out_df.push_back(otto, riname[coln]);
         }
+
+        int prootset[5] = {10,11,12,13,14};
+        int krootset[5] = {45,46,47,48,49};
+        int erootset[5] = {50,51,52,53,54};
+
+        List Lproot = List::create();
+        List Lkroot = List::create();
+        List Leroot = List::create();
+
+
+
+        for(int rown=2; rown < dd+3; rown++){
+          //for(int coln=10; coln < 15; coln++){
+
+        //  }
+          NumericVector jaylen {dataCells[rown][10], dataCells[rown][11], dataCells[rown][12], dataCells[rown][13], dataCells[rown][14]};
+          Lproot.push_back(jaylen);
+
+          NumericVector jayson {dataCells[rown][45], dataCells[rown][46], dataCells[rown][47], dataCells[rown][48], dataCells[rown][49]};
+          Lkroot.push_back(jayson);
+
+          NumericVector smarf {dataCells[rown][50], dataCells[rown][51], dataCells[rown][52], dataCells[rown][53], dataCells[rown][54]};
+          Leroot.push_back(smarf);
+        }
+        ts_out_df.push_back(Lproot, "fuckpl");
+        ts_out_df.push_back(Lkroot, "fuckkl");
+        ts_out_df.push_back(Leroot, "fuckel");
+
 
   /*
         for(int coln=1; coln < ncol_sumhead + 1; coln++){
@@ -4958,7 +4990,7 @@ public:
          S4 ri_o = modelobj.slot("Outputs");
 
          ri_o.slot("timesteps") = ts_out_df;
-         ri_o.slot("summary") = su_out_df;
+         //ri_o.slot("summary") = su_out_df;
          }
 
 

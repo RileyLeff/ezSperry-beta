@@ -50,6 +50,12 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
     
     runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
     
+    
+    xxx = as.data.frame(.dtt@Outputs@timesteps[1:42])
+    xxx$psiroot_layers = .dtt@Outputs@timesteps$fuckpl
+    xxx$kroot_layers = .dtt@Outputs@timesteps$fuckkl
+    xxx$eroot_layers = .dtt@Outputs@timesteps$fuckel
+    
     if(bounce){
         if(skinny){
             return(model_obj@Outputs)
