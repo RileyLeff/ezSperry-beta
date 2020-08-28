@@ -1,0 +1,7 @@
+test_that("riley is alive", {
+    x <- 1:3
+    actual <- foreach(i=x) %do% i
+    expect_identical(actual, as.list(x))
+    actual <- foreach(i=x, .combine='c') %do% i
+    expect_identical(actual, x)
+})

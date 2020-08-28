@@ -1,0 +1,5 @@
+useDynLib(ezsperry, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
+importFrom("methods", "new")
+importFrom("utils", "read.csv")

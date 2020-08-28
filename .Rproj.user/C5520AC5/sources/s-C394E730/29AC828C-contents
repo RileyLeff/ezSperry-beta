@@ -1,0 +1,15 @@
+Package: ezsperry
+Type: Package
+Title: Rileystuff is Happening Here
+Version: 1.0
+Date: 2020-08-27
+Authors@R: c(
+    person("Riley", "Leff", email = "rileyleff@gmail.com", role = "cre"))
+Description: fuck
+License: GPL (>= 2)
+Imports: 
+    Rcpp (>= 1.0.5),
+    purrr
+LinkingTo: Rcpp
+Suggests: 
+    testthat
