@@ -6,13 +6,12 @@
 using namespace Rcpp;
 
 // runit2
-int runit2(S4 modelobj, std::string path9, NumericVector jmax_vary, NumericVector vmax_vary, NumericVector lai_vary, List swc_vary, NumericVector dep_vary, NumericVector rad_vary, int read_n_layers, std::string nametag, int riyc, int rinr);
-RcppExport SEXP _ezsperry_runit2(SEXP modelobjSEXP, SEXP path9SEXP, SEXP jmax_varySEXP, SEXP vmax_varySEXP, SEXP lai_varySEXP, SEXP swc_varySEXP, SEXP dep_varySEXP, SEXP rad_varySEXP, SEXP read_n_layersSEXP, SEXP nametagSEXP, SEXP riycSEXP, SEXP rinrSEXP) {
+int runit2(S4 modelobj, NumericVector jmax_vary, NumericVector vmax_vary, NumericVector lai_vary, List swc_vary, NumericVector dep_vary, NumericVector rad_vary, int read_n_layers, std::string nametag, int riyc, int rinr);
+RcppExport SEXP _ezsperry_runit2(SEXP modelobjSEXP, SEXP jmax_varySEXP, SEXP vmax_varySEXP, SEXP lai_varySEXP, SEXP swc_varySEXP, SEXP dep_varySEXP, SEXP rad_varySEXP, SEXP read_n_layersSEXP, SEXP nametagSEXP, SEXP riycSEXP, SEXP rinrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< S4 >::type modelobj(modelobjSEXP);
-    Rcpp::traits::input_parameter< std::string >::type path9(path9SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type jmax_vary(jmax_varySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type vmax_vary(vmax_varySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lai_vary(lai_varySEXP);
@@ -23,13 +22,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type nametag(nametagSEXP);
     Rcpp::traits::input_parameter< int >::type riyc(riycSEXP);
     Rcpp::traits::input_parameter< int >::type rinr(rinrSEXP);
-    rcpp_result_gen = Rcpp::wrap(runit2(modelobj, path9, jmax_vary, vmax_vary, lai_vary, swc_vary, dep_vary, rad_vary, read_n_layers, nametag, riyc, rinr));
+    rcpp_result_gen = Rcpp::wrap(runit2(modelobj, jmax_vary, vmax_vary, lai_vary, swc_vary, dep_vary, rad_vary, read_n_layers, nametag, riyc, rinr));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ezsperry_runit2", (DL_FUNC) &_ezsperry_runit2, 12},
+    {"_ezsperry_runit2", (DL_FUNC) &_ezsperry_runit2, 11},
     {NULL, NULL, 0}
 };
 
