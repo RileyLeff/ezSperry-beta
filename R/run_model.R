@@ -61,7 +61,7 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
     
     if(bounce){
         if(skinny){
-            return(model_obj@Outputs@timesteps)
+            return(xxx)
         } else{
         return(model_obj)
         }
