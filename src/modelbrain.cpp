@@ -4338,11 +4338,7 @@ public:
    {
 
     Rcpp::checkUserInterrupt();
-    if(dd < 100)
-    {
-      Rcout << "riley_prev_plc is " << riley_prev_plc << " \n";
-      Rcout << "riley_early_kill_plc is " << riley_early_kill_plc << " \n";
-      }
+
     if (riley_prev_plc > riley_early_kill_plc) // if we need to kill the model early
     {
       dSheet.Cells(rowD + 1 + dd, colD + dColDay) = 0; // set the next jd to 0 to kill the modeltimestepiter while loop
