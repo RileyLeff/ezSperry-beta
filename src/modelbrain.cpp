@@ -206,6 +206,8 @@ long getColFromName(std::string name)
 NumericVector ri_j;
 NumericVector ri_v;
 NumericVector ri_l;
+double riley_prev_plc;
+double riley_early_kill_plc;
 List ri_swc;
 NumericVector ri_dep;
 NumericVector ri_rad;
@@ -2569,6 +2571,7 @@ public:
          }
          dSheet.Cells(rowD + dd, colD + dColF_End_PLCplant) = tempDouble; //'100 * (1 - dSheet.Cells(rowD - 1 + dd, colD + dColF_CP_kplant) / kpday1) 'plc plant...prior timestep
 
+         riley_prev_plc = tempDouble; // hanging onto this value to kill dead models early
                                                                           // no matter what, add it to the tally for calculating the mean over-season PLCp
          gs_ar_PLCSum[gs_yearIndex] = gs_ar_PLCSum[gs_yearIndex] + tempDouble; // yearly running total of PLC values
          gs_ar_PLCSum_N[gs_yearIndex] = gs_ar_PLCSum_N[gs_yearIndex] + 1; // total hours in GS
@@ -4335,6 +4338,17 @@ public:
    {
 
     Rcpp::checkUserInterrupt();
+    if(dd < 100)
+    {
+      Rcout << "riley_prev_plc is " << riley_prev_plc << " \n";
+      Rcout << "riley_early_kill_plc is " << riley_early_kill_plc << " \n";
+      }
+    if (riley_prev_plc > riley_early_kill_plc) // if we need to kill the model early
+    {
+      dSheet.Cells(rowD + 1 + dd, colD + dColDay) = 0; // set the next jd to 0 to kill the modeltimestepiter while loop
+    }
+
+
 
 
 
@@ -5334,6 +5348,9 @@ int runit2(S4 modelobj, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0
 
     // RILEY :: yo are we in alex mode???? young sperrymodel he kinda vibin in alex mode doe
     alex_mode = r_o_1.slot("alex_mode");
+
+    // RILEY :: when will the pain ever end
+    riley_early_kill_plc = r_o_1.slot("early_kill_plc");
 
     if(alex_mode){
       Rcout << "Alex mode is ACTIVATED." << "\n";
