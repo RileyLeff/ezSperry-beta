@@ -4196,15 +4196,15 @@ public:
          }
          if (total == 0)
          {
-            std::cout << "Terminated sun layer opt without finding peak: end case 2 total == 0" << std::endl;
+            //std::cout << "Terminated sun layer opt without finding peak: end case 2 total == 0" << std::endl;
          }
          if (p >= totalv)
          {
-            std::cout << "Terminated sun layer opt without finding peak: end case 3 exceeded end of virgin curve" << std::endl;
+            //std::cout << "Terminated sun layer opt without finding peak: end case 3 exceeded end of virgin curve" << std::endl;
          }
          if (klossv[p] > 0.9)
          {
-            std::cout << "Terminated sun layer opt without finding peak: end case 4 klossv[p] > 0.9" << std::endl;
+            //std::cout << "Terminated sun layer opt without finding peak: end case 4 klossv[p] > 0.9" << std::endl;
          }
       }
       // [/HNT]
@@ -4550,7 +4550,7 @@ public:
             if (ecritsystem == 0)
             {
                einc = ksatp / 500.0;
-               std::cout << "ecritsystem is zero... try resetting to ksatp/500, dd = " << dd << std::endl;
+               //std::cout << "ecritsystem is zero... try resetting to ksatp/500, dd = " << dd << std::endl;
             }
 
             goto twentyMarker;
@@ -4561,7 +4561,7 @@ public:
             if (ecritsystem == 0)
             {
                einc = ksatp / 500.0;
-               std::cout << "ecritsystem is zero... try resetting to ksatp/500, dd = " << dd << std::endl;
+               //std::cout << "ecritsystem is zero... try resetting to ksatp/500, dd = " << dd << std::endl;
             }
             testCount++; // [DEBUG]
             if (testCount > 10)
@@ -4862,7 +4862,7 @@ public:
             baperga = iter_baga * 0.0001;
             //if we set the BA:GA { also set the LAI
             lai = (laperba * baperga) / treeToPhotoLAI;
-            std::cout << "DEBUG: set BA:GA to " << iter_baga << " m2/ha -> " << baperga << "m2/m2. treeLAI/fotoLAI = " << treeToPhotoLAI << " and LAI set to " << lai << std::endl;
+          //  std::cout << "DEBUG: set BA:GA to " << iter_baga << " m2/ha -> " << baperga << "m2/m2. treeLAI/fotoLAI = " << treeToPhotoLAI << " and LAI set to " << lai << std::endl;
          } //End if
 
       } //End if
@@ -4930,8 +4930,8 @@ public:
         DataFrame ts_out_df = DataFrame::create();
          //DataFrame su_out_df = DataFrame::create();
 
-        Rcout << "dd is " << dd << " \n";
-        Rcout << "yearCount is " << yearCount << " \n";
+        //Rcout << "dd is " << dd << " \n";
+      //  Rcout << "yearCount is " << yearCount << " \n";
 
         int ncol_datahead = 70;
         //int ncol_sumhead = 33;
@@ -5235,7 +5235,7 @@ long ModelProgram::modelProgramMain(S4 modelobj) //program starts here
       }
 
       if (dd % 1000 == 0)
-         std::cout << "Timestep " << dd << " completed" << std::endl;
+         // std::cout << "Timestep " << dd << " completed" << std::endl;
    } while (!(dSheet.Cells(rowD + 1 + dd, colD + dColDay) < 0.01)); // loop until the jd value on next row is zero -- it's an integer, but everything is stored in the array as double
 
                                                                     //Dim gsCount As Long
