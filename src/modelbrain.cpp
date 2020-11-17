@@ -5234,7 +5234,7 @@ long ModelProgram::modelProgramMain(S4 modelobj) //program starts here
             gs_ar_waterFinal_GS[gs_yearIndex] = dSheet.Cells(rowD + dd - 1, colD + dColF_End_watercontent); // if this was the end of the set of years, gs_yearIndex will not have been changed so use as-is
       }
 
-      if (dd % 1000 == 0)
+      //if (dd % 1000 == 0)
          // std::cout << "Timestep " << dd << " completed" << std::endl;
    } while (!(dSheet.Cells(rowD + 1 + dd, colD + dColDay) < 0.01)); // loop until the jd value on next row is zero -- it's an integer, but everything is stored in the array as double
 
