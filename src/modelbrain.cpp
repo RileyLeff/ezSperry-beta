@@ -1110,7 +1110,7 @@ public:
            Rcpp::DataFrame ri_soil_layers = Rcpp::DataFrame(ri_psoil_init.get__());
 
 
-          std::cout << "INIT: Setting up model parameters. (year count = " << gs_yearIndex << ")" << std::endl;
+          //std::cout << "INIT: Setting up model parameters. (year count = " << gs_yearIndex << ")" << std::endl;
 
            treeToPhotoLAI = riley_p_soil.slot("tlai_to_plai");//getValueFromNameDbl("i_treeToPhotoLAI"); // these names come from the "nametable" and correspond to cells in the parameters csv
 
