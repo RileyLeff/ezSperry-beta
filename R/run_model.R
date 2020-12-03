@@ -54,7 +54,7 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
     xxx$psiroot_layers = model_obj@Outputs@timesteps$fuckpl
     xxx$kroot_layers = model_obj@Outputs@timesteps$fuckkl
     xxx$eroot_layers = model_obj@Outputs@timesteps$fuckel
-    #xxx$posi = as.POSIXct(x = paste(model_obj@data$Day, model_obj@data$Year, model_obj@data$Hour, sep = ":"), format = "%j:%Y:%H")
+    xxx$posi = as.POSIXct(x = paste(model_obj@data$Day, model_obj@data$Year, model_obj@data$Hour, sep = ":"), format = "%j:%Y:%H")
     return(xxx)
     eval(parse(text = paste(model_obj,"@Outputs@timesteps <<- xxx")))
 
