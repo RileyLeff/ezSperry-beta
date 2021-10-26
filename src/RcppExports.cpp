@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // runit2
 int runit2(S4 modelobj, NumericVector jmax_vary, NumericVector vmax_vary, NumericVector lai_vary, List swc_vary, NumericVector dep_vary, NumericVector rad_vary, int read_n_layers, std::string nametag, int riyc, int rinr);
 RcppExport SEXP _ezsperry_runit2(SEXP modelobjSEXP, SEXP jmax_varySEXP, SEXP vmax_varySEXP, SEXP lai_varySEXP, SEXP swc_varySEXP, SEXP dep_varySEXP, SEXP rad_varySEXP, SEXP read_n_layersSEXP, SEXP nametagSEXP, SEXP riycSEXP, SEXP rinrSEXP) {

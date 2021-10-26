@@ -4926,10 +4926,8 @@ public:
                                   "e_mm","drainage","soil_evap","evapot_mmol","anet_mmol",
                                   "total_water_input",
                                   "plc_plant","plc_xylem","runoff"};
-
         DataFrame ts_out_df = DataFrame::create();
          //DataFrame su_out_df = DataFrame::create();
-
         //Rcout << "dd is " << dd << " \n";
       //  Rcout << "yearCount is " << yearCount << " \n";
 
@@ -4946,6 +4944,7 @@ public:
               ts_out_df.push_back(otto, riname[coln]);
         }
 
+
         int prootset[5] = {10,11,12,13,14};
         int krootset[5] = {45,46,47,48,49};
         int erootset[5] = {50,51,52,53,54};
@@ -4955,11 +4954,11 @@ public:
         List Leroot = List::create();
 
 
-
         for(int rown=2; rown < dd+3; rown++){
           //for(int coln=10; coln < 15; coln++){
 
         //  }
+
           NumericVector jaylen {dataCells[rown][10], dataCells[rown][11], dataCells[rown][12], dataCells[rown][13], dataCells[rown][14]};
           Lproot.push_back(jaylen);
 
@@ -4969,9 +4968,22 @@ public:
           NumericVector smarf {dataCells[rown][50], dataCells[rown][51], dataCells[rown][52], dataCells[rown][53], dataCells[rown][54]};
           Leroot.push_back(smarf);
         }
-        ts_out_df.push_back(Lproot, "fuckpl");
-        ts_out_df.push_back(Lkroot, "fuckkl");
-        ts_out_df.push_back(Leroot, "fuckel");
+
+
+        std::cout << "RTL: come back to fix lp,lk,leroot" << std::endl;
+
+        //ts_out_df.push_back(Lproot, "fuckpl");
+        //ts_out_df.push_back(Lkroot, "fuckkl");
+        //ts_out_df.push_back(Leroot, "fuckel");
+
+        // ^^^ these 3 commented-out lines were breaking model
+
+        // Lproot is a list
+               // for each row #, we add a numericvector containing 5 values to the list
+         // we then take our list of vectors of scalars and push it to the back of ts_out_df, WHICH DOESNT WORK 
+
+      // what i want is for ts_out_df to get a new column "fuckpl"
+      // fuckpl contains dataCells[rown][10] through [14] in a list 
 
 
   /*
@@ -4997,9 +5009,11 @@ public:
            su_out_df.push_back(ozzy);
          }
 */
+std::cout << "Rileydebug before s4 ri_o" << std::endl;
          S4 ri_o = modelobj.slot("Outputs");
-
+std::cout << "Rileydebug after s4 ri_o" << std::endl;
          ri_o.slot("timesteps") = ts_out_df;
+std::cout << "Rileydebug before timesteps slot out" << std::endl;
          //ri_o.slot("summary") = su_out_df;
          }
 
@@ -5296,14 +5310,16 @@ long ModelProgram::modelProgramMain(S4 modelobj) //program starts here
    } // Next gsCount
    //saveOutputSheet("./" + stageNames[stage_ID] + "_OUTPUT_timesteps", "timesteps");
    //saveOutputSheet("./" + stageNames[stage_ID] + "_OUTPUT_summary", "summary");
+   std::cout << "Rileydebug before rileydataout" << std::endl;
     riley_data_out(modelobj);
+    std::cout << "Rileydebug after rileydataout" << std::endl;
    return 1;
 }
 
 // [[Rcpp::export]]
 int runit2(S4 modelobj, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0, NumericVector lai_vary = 0, List swc_vary = 0, NumericVector dep_vary = 0, NumericVector rad_vary = 0, int read_n_layers = 5, std::string nametag = "spemo", int riyc = 0, int rinr = 0)
 {
-    // RILEY :: riley logging on time to make this code worse :)
+    // RILEY :: riley logging on, time to make this code worse :)
     // if I had just learned C++ or Rust thoroughly instead of halfway I could've written a really good model
     // instead of writing some superjunk
     // and i wouldn't have to spend so much time adding idiotic bandaids to the mess that I have created
@@ -5385,7 +5401,6 @@ int runit2(S4 modelobj, NumericVector jmax_vary = 0, NumericVector vmax_vary = 0
    // to do a normal run that's only based on local folder parameter sheet settings, set the stage_ID to zero
    mainProg.stage_ID = STAGE_ID_NONE;
    result = mainProg.modelProgramMain(modelobj); // for returning failure error codes... not really used in this version
-
    if (!result)
    {
       std::cout << "Model Failure! Stage " << mainProg.stage_ID << std::endl;

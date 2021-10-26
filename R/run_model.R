@@ -47,9 +47,9 @@ run_sperry = function(model_obj, .dtt = deparse(substitute(model_obj)), bounce =
 
     riyc = length(unique(model_obj@data$Year))
     rinr = nrow(model_obj@data)
-
+    print("help")
     runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
-
+    print("hello")
     xxx = as.data.frame(model_obj@Outputs@timesteps[1:42])
     xxx$psiroot_layers = model_obj@Outputs@timesteps$fuckpl
     xxx$kroot_layers = model_obj@Outputs@timesteps$fuckkl
