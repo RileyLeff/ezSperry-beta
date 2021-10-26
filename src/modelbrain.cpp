@@ -5009,11 +5009,8 @@ public:
            su_out_df.push_back(ozzy);
          }
 */
-std::cout << "Rileydebug before s4 ri_o" << std::endl;
          S4 ri_o = modelobj.slot("Outputs");
-std::cout << "Rileydebug after s4 ri_o" << std::endl;
          ri_o.slot("timesteps") = ts_out_df;
-std::cout << "Rileydebug before timesteps slot out" << std::endl;
          //ri_o.slot("summary") = su_out_df;
          }
 
@@ -5310,9 +5307,7 @@ long ModelProgram::modelProgramMain(S4 modelobj) //program starts here
    } // Next gsCount
    //saveOutputSheet("./" + stageNames[stage_ID] + "_OUTPUT_timesteps", "timesteps");
    //saveOutputSheet("./" + stageNames[stage_ID] + "_OUTPUT_summary", "summary");
-   std::cout << "Rileydebug before rileydataout" << std::endl;
     riley_data_out(modelobj);
-    std::cout << "Rileydebug after rileydataout" << std::endl;
    return 1;
 }
 
