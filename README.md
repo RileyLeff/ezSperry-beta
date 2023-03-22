@@ -62,3 +62,12 @@ Calling `run_sperry()` parses the inputs and parameters, then passes them to Joh
 
 See the paper(s) linked at the top
 
+## check table
+
+lemme see if this table renders correctly on github
+
+| Tables   |      Are      |  Cool |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
