@@ -16,7 +16,7 @@ This package is an R wrapper around the C version of Sperry's stomatal optimizat
 
 Run with defaults:
 
-```{r} 
+```{r}
 # import the package
 library(ezsperry)
 
@@ -43,8 +43,22 @@ bar = run_sperry(foo)
 ```
 
 Inspect data/params:
+
 ```{r}
 library(ezsperry)
 foo = new_sperry_model()
 str(foo)
 ```
+
+## how the wrapper works
+
+Calling `new_sperry_model()` instantiates a custom S4 object that contains parameters, input data, and an empty slot for outputs.
+
+Calling `run_sperry()` parses the inputs and parameters, then passes them to John Sperry's C program. This program has been lightly modified to accept R Objects as inputs. After the model runs in C, it captures the outputs and brings 'em back over to R.
+
+
+
+## how the model works
+
+See the paper(s) linked at the top
+
