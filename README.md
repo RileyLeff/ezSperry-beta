@@ -59,8 +59,10 @@ Calling `run_sperry()` parses the inputs and parameters, then passes them to Joh
 
 ## Sperry_Model S4 Object Structure
 
-Riley needs to put info about how the S4 object is organized here. 
 
+### Slot @Parameters
+
+### Slot @data
 The slot @data contains a dataframe, with columns as follows:
 | column name   | what it is                      | unit                | data type | optional? | notes                                                                                                                               |
 |---------------|---------------------------------|---------------------|-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -84,3 +86,4 @@ It's getting late, I'll add the Params & Output descriptions tomorrow, sorry for
 ## how the model works
 
 See the paper(s) linked at the top
+

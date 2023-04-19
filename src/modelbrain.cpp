@@ -3312,7 +3312,7 @@ public:
       lambda = -42.9143 * airtemp + 45064.3; //'heat of vaporization for water at air temp in J mol-1
       grad = 0.1579 + 0.0017 * airtemp + 0.00000717 * pow(airtemp, 2); //'radiative conductance (long wave) at air temp in mol m-2 s-1
       gha = 1.4 * 0.135 * pow((wind / leafwidth), 0.5); //'heat conductance in mol m-2s-1
-      emd = e * (1 / laperba) * (1.0 / 3600.0) * 55.4; //'convert to E per leaf area in mol m-2s-1
+      emd = e * (1 / laperba) * (1.0 / 3600.0) * 55.4; //'convert to E per leaf area in mol m-2s-1 THE 55.4 IS THE SAME AS DIVIDING BY MOLAR MASS OF WATER AND ALSO DIVIDING BY 1000 (hence millimols)
       numerator = rabs - emiss * sbc * pow((airtemp + 273.2), 4) - lambda * emd / 2.0; //'divide E by 2 because energy balance is two sided.
       denominator = sha * (grad + gha);
       leaftmd = airtemp + numerator / denominator; //'leaf temp for supply function
