@@ -144,7 +144,12 @@ sp_data_df_ <- data.frame()
 #####
 # OUTPUT PARENT
 #####
-setClass("Sperry_Output", representation(summary = "data.frame", timesteps = "data.frame"))
+setClass("Sperry_Output", representation(
+    summary = "data.frame", 
+    timesteps = "data.frame",
+    misc_testing = "data.frame"
+    )
+)
 
 
 

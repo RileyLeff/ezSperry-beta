@@ -221,6 +221,11 @@ std::string globalnametag;
 int riley_year_count;
 int riley_nr_chillin;
 
+NumericVector laisl_out {};
+NumericVector laish_out {};
+NumericVector kbe_out {};
+NumericVector kbe_zero_out {};
+
 
 class ModelProgram
 {
@@ -2193,6 +2198,7 @@ public:
          double testNum = pow((pow(xang, 2.0) + pow((tan(zen)), 2.0)), 2.0);
          double testDenom = (xang + 1.774 * pow((xang + 1.182), -0.733));
          kbe = pow((pow(xang, 2.0) + pow((tan(zen)), 2.0)), 0.5) / (xang + 1.774 * pow((xang + 1.182), -0.733)); //'beam extinction coefficient CN 15.4
+
                                                                                                                  //kbe = Sqr(xang ^ 2 + (Tan(zen)) ^ 2) / (xang + 1.774 * (xang + 1.182) ^ -0.733) 'beam extinction coefficient CN 15.4
          kbezero = xang / (xang + 1.774 * pow((xang + 1.182), -0.733)); //'beam extinction for zen=0(overhead
          mleafang = atan(-kbezero / pow((-kbezero * kbezero + 1), 0.5)) + 2 * atan(1); //'mean leaf angle in radians
@@ -4666,6 +4672,13 @@ public:
 
          dSheet.Cells(rowD + dd, colD + o + dColF_T_E) = transpirationtree; //'weighted mean
          dSheet.Cells(rowD + dd, colD + o + dColF_T_ANet) = atree;
+         Rcout << "BEFORE PUSH laisl is " << laisl << " \n";
+         laisl_out.push_back(laisl);
+         Rcout << "AFTER PUSH laisl is " << laisl << " \n";
+         laish_out.push_back(laish);
+         kbe_out.push_back(kbe);
+         kbe_zero_out.push_back(kbezero);
+
          //'Cells(16 + dd, o + 35) = dpamax //'shade leaf dpa
          //'HYDRAULIC OUTPUT (BASED ON SUN MD)
          dSheet.Cells(rowD + dd, colD + o + dColF_T_pcrit) = pcritsystem;
@@ -4927,6 +4940,13 @@ public:
                                   "total_water_input",
                                   "plc_plant","plc_xylem","runoff"};
         DataFrame ts_out_df = DataFrame::create();
+        
+        DataFrame misc_out_df = DataFrame::create( 
+         Named("laisl") = laisl_out , 
+         _["laish"] = laish_out,
+         _["kbe"] = kbe_out,
+         _["kbezero"] = kbe_zero_out);
+
          //DataFrame su_out_df = DataFrame::create();
         //Rcout << "dd is " << dd << " \n";
       //  Rcout << "yearCount is " << yearCount << " \n";
@@ -5011,6 +5031,7 @@ public:
 */
          S4 ri_o = modelobj.slot("Outputs");
          ri_o.slot("timesteps") = ts_out_df;
+         ri_o.slot("misc_testing") = misc_out_df;
          //ri_o.slot("summary") = su_out_df;
          }
 
