@@ -221,10 +221,8 @@ std::string globalnametag;
 int riley_year_count;
 int riley_nr_chillin;
 
-NumericVector laisl_out {};
-NumericVector laish_out {};
-NumericVector kbe_out {};
-NumericVector kbe_zero_out {};
+
+
 
 
 class ModelProgram
@@ -257,7 +255,10 @@ public:
     NumericVector ri_ksat = NumericVector(5);
     NumericVector ri_theta_sat = NumericVector(5);
 
-
+   NumericVector laisl_out = NumericVector::create(0.0);
+   NumericVector laish_out = NumericVector::create(0.0);
+   NumericVector kbe_out = NumericVector::create(0.0);
+   NumericVector kbe_zero_out = NumericVector::create(0.0);
 
    std::string failspot, layerfailure[6], tlayerfailure[6], setting, refilling, ground, soilred;
    double dp, kplant[100001], kminplant, toplayer;
@@ -4672,9 +4673,7 @@ public:
 
          dSheet.Cells(rowD + dd, colD + o + dColF_T_E) = transpirationtree; //'weighted mean
          dSheet.Cells(rowD + dd, colD + o + dColF_T_ANet) = atree;
-         Rcout << "BEFORE PUSH laisl is " << laisl << " \n";
          laisl_out.push_back(laisl);
-         Rcout << "AFTER PUSH laisl is " << laisl << " \n";
          laish_out.push_back(laish);
          kbe_out.push_back(kbe);
          kbe_zero_out.push_back(kbezero);
@@ -4945,7 +4944,8 @@ public:
          Named("laisl") = laisl_out , 
          _["laish"] = laish_out,
          _["kbe"] = kbe_out,
-         _["kbezero"] = kbe_zero_out);
+         _["kbezero"] = kbe_zero_out
+         );
 
          //DataFrame su_out_df = DataFrame::create();
         //Rcout << "dd is " << dd << " \n";

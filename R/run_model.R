@@ -1,4 +1,4 @@
-run_sperry <- function(model_obj, .dtt = deparse(substitute(model_obj)), bounce = FALSE, skinny = FALSE, nametag = "rileyiscool", returnNA = FALSE, returnnull = FALSE) {
+run_sperry <- function(model_obj) {
   riley_jmax_array <- NA
   riley_vmax_array <- NA
   riley_lai_array <- NA
@@ -20,7 +20,7 @@ run_sperry <- function(model_obj, .dtt = deparse(substitute(model_obj)), bounce 
 
   if (model_obj@Parameters@Options@depth_override) {
     riley_depth_array <- model_obj@Parameters@soil_layers$depths_optional
-    riley_depth_array2 <- c(0.02)
+    riley_depth_array2 <- c(0.02) # for the secret "zeroth" layer of organic material in the C code
     riley_depth_array2[2:(length(riley_depth_array) + 1)] <- riley_depth_array
 
     if (length(riley_depth_array) > 1) {
@@ -40,20 +40,10 @@ run_sperry <- function(model_obj, .dtt = deparse(substitute(model_obj)), bounce 
 
   nlayers <- nrow(model_obj@Parameters@soil_layers)
 
-  tagid <- "spemo"
-  if (!is.na(nametag)) {
-    if (nametag == "id") {
-      tagid <- model_obj@Parameters@Options@id
-    } else if (nametag == "tag") {
-      tagid <- model_obj@Parameters@Options@tag
-    } else if (is.character(nametag) & !is.na(nametag)) {
-      tagid <- nametag
-    }
-  }
-
   riyc <- length(unique(model_obj@data$Year))
   rinr <- nrow(model_obj@data)
-  runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
+  tagid = "Sperry Model"
+  success_code <- runit2(model_obj, riley_jmax_array, riley_vmax_array, riley_lai_array, riley_swc_array, riley_depth_array2, riley_radius_array2, nlayers, tagid, riyc, rinr)
   xxx <- as.data.frame(model_obj@Outputs@timesteps[1:42])
   xxx$psiroot_layers <- model_obj@Outputs@timesteps$fuckpl
   xxx$kroot_layers <- model_obj@Outputs@timesteps$fuckkl
