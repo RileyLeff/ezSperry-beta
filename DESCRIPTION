@@ -1,6 +1,6 @@
 Package: ezsperry
 Type: Package
-Title: Rileystuff is Happening Here
+Title: ezsperry
 Version: 1.0
 Date: 2020-08-27
 Authors@R: c(
@@ -15,3 +15,6 @@ LinkingTo: Rcpp
 Suggests: 
     testthat
 SystemRequirements: C++11
+LazyData: true
+Depends: 
+    R (>= 2.10)
